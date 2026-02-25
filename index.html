@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Miner V6: The Singularity</title>
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-grad-1: #0f172a; --bg-grad-2: #1e293b; --bg-grad-3: #0f2027;
+            --panel-bg: rgba(15, 23, 42, 0.85); --text-main: #f8fafc; --text-muted: #94a3b8;
+            --click-color: #38bdf8; --coin-color: #fbbf24; --gem-color: #e879f9; --mat-color: #a78bfa; --dm-color: #ef4444;
+            --radius-md: 12px; --radius-sm: 8px;
+        }
+
+        /* Deep Themes */
+        body.theme-green { --bg-grad-1: #064e3b; --bg-grad-2: #065f46; --bg-grad-3: #022c22; --click-color: #34d399; --panel-bg: rgba(6, 78, 59, 0.85); --mat-color: #6ee7b7;}
+        body.theme-water { --bg-grad-1: #0c4a6e; --bg-grad-2: #0369a1; --bg-grad-3: #082f49; --click-color: #38bdf8; --panel-bg: rgba(12, 74, 110, 0.85); --mat-color: #7dd3fc;}
+        body.theme-glitter { --bg-grad-1: #4a044e; --bg-grad-2: #701a75; --bg-grad-3: #2e1065; --click-color: #f472b6; --panel-bg: rgba(74, 4, 78, 0.85); --mat-color: #fbcfe8;}
+        body.theme-gold { --bg-grad-1: #452e04; --bg-grad-2: #785209; --bg-grad-3: #332001; --click-color: #fde047; --panel-bg: rgba(69, 46, 4, 0.85); --text-main: #fef08a; --mat-color: #fcd34d;}
+        body.theme-void { --bg-grad-1: #000000; --bg-grad-2: #111111; --bg-grad-3: #220022; --click-color: #c084fc; --panel-bg: rgba(0, 0, 0, 0.9); --text-main: #e9d5ff; --mat-color: #d8b4fe;}
+
+        /* Ability Overlays */
+        body.golden-dice-active { animation: diceGlow 2s infinite alternate; }
+        @keyframes diceGlow { 0% { box-shadow: inset 0 0 50px rgba(250, 204, 21, 0.2); } 100% { box-shadow: inset 0 0 150px rgba(250, 204, 21, 0.6); } }
+        #timeskip-flash { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2), var(--bg-grad-3)); background-size: 400% 400%; animation: gradBG 15s ease infinite; color: var(--text-main); display: flex; height: 100vh; overflow: hidden; user-select: none;}
+        @keyframes gradBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* --- LAYOUT --- */
+        .panel { background: var(--panel-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); transition: background 0.5s; display: flex; flex-direction: column; }
+        #left-panel { width: 320px; padding: 20px; border-right: 2px solid var(--click-color); overflow-y: auto; z-index: 10; }
+        #center-panel { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        #right-panel { width: 520px; padding: 20px; border-left: 2px solid var(--click-color); z-index: 10; }
+
+        /* --- 3D SCENE --- */
+        .scene { width: 220px; height: 220px; perspective: 1000px; cursor: pointer; transition: transform 0.05s; }
+        .scene:active { transform: scale(0.92); } 
+        .cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; animation: spin 15s infinite linear; }
+        .cube-face { position: absolute; width: 220px; height: 220px; border: 2px solid var(--click-color); background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 40px rgba(0,0,0,0.5); font-size: 50px; text-shadow: 0 0 20px var(--click-color); border-radius: 16px; transition: 0.3s;}
+        .cube-face:hover { background: rgba(255,255,255,0.1); box-shadow: inset 0 0 60px var(--click-color); }
+        body.theme-gold .cube-face { background: rgba(253, 224, 71, 0.15); box-shadow: inset 0 0 60px #eab308; border-color: #fef08a; }
+        
+        /* CORRUPTION STYLES */
+        .scene.corrupted .cube-face { border-color: #ef4444; background: rgba(239, 68, 68, 0.2); box-shadow: inset 0 0 80px #991b1b; text-shadow: 0 0 30px #ef4444; animation: shake 0.5s infinite; }
+        #corrupt-ui { display: none; position: absolute; top: 20%; text-align: center; color: #ef4444; text-shadow: 0 0 10px #ef4444; font-weight: 900;}
+
+        .front { transform: rotateY(0deg) translateZ(110px); } .right { transform: rotateY(90deg) translateZ(110px); } .back { transform: rotateY(180deg) translateZ(110px); } .left { transform: rotateY(-90deg) translateZ(110px); } .top { transform: rotateX(90deg) translateZ(110px); } .bottom { transform: rotateX(-90deg) translateZ(110px); }
+        @keyframes spin { 100% { transform: rotateX(360deg) rotateY(360deg); } }
+        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 25% { transform: translate(-1px, -2px) rotate(-1deg); } 50% { transform: translate(-3px, 0px) rotate(1deg); } 75% { transform: translate(3px, 2px) rotate(0deg); } 100% { transform: translate(1px, -1px) rotate(1deg); } }
+
+        /* --- UI ELEMENTS --- */
+        h2, h3 { margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+        .cat-header { background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold; color: var(--click-color); margin: 15px 0 10px 0; border-left: 3px solid var(--click-color);}
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .stat-box { background: rgba(0,0,0,0.5); padding: 10px; border-radius: var(--radius-sm); display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05);}
+        .stat-val { font-weight: 900; font-size: 16px; margin-top: 4px; }
+        .color-clicks { color: var(--click-color); } .color-coins { color: var(--coin-color); } .color-gems { color: var(--gem-color); } .color-mat { color: var(--mat-color); } .color-dm { color: var(--dm-color); text-shadow: 0 0 5px #ef4444;}
+        
+        .tabs { display: flex; gap: 4px; margin-bottom: 15px; flex-wrap: wrap; flex-shrink: 0;}
+        .tab-btn { flex: 1; min-width: 60px; padding: 6px 4px; background: rgba(0,0,0,0.6); color: white; border: none; cursor: pointer; border-radius: var(--radius-sm); font-size: 11px; font-weight: bold; border-bottom: 2px solid transparent; transition: 0.2s;}
+        .tab-btn:hover { background: rgba(255,255,255,0.1); }
+        .tab-btn.active { background: rgba(255,255,255,0.15); border-color: var(--click-color); }
+        .tab-content { display: none; flex-grow: 1; overflow-y: auto; padding-right: 5px; }
+        .tab-content.active { display: block; }
+
+        .card { background: rgba(0,0,0,0.4); padding: 12px; margin-bottom: 10px; border-radius: var(--radius-md); border-left: 4px solid #475569; position: relative; transition: 0.2s;}
+        .card:hover { background: rgba(0,0,0,0.6); }
+        .card h4 { margin: 0 0 4px 0; font-size: 14px; display: flex; justify-content: space-between; align-items: center;}
+        .card p { margin: 2px 0; font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+        .badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+        .btn-act { background: var(--click-color); color: #000; border: none; padding: 8px; cursor: pointer; border-radius: var(--radius-sm); font-weight: bold; width: 100%; margin-top: 8px; font-size: 12px; transition: 0.2s;}
+        .btn-act:hover:not(:disabled) { filter: brightness(1.2); transform: translateY(-1px); }
+        .btn-act:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; opacity: 0.6;}
+
+        /* COMBO UI */
+        #combo-container { margin-top: 30px; text-align: center; width: 80%; }
+        #combo-txt { font-size: 28px; font-weight: 900; color: var(--click-color); text-shadow: 0 0 15px var(--click-color); min-height: 35px; transition: 0.1s; }
+        .combo-bar-bg { width: 100%; height: 10px; background: rgba(0,0,0,0.5); border-radius: 5px; margin-top: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);}
+        #combo-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #38bdf8, #e879f9); }
+
+        /* MINIGAME */
+        .mine-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 15px; perspective: 600px; }
+        .mine-tile { background: rgba(0,0,0,0.6); border: 2px solid #334155; height: 65px; border-radius: 8px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.5s; display: flex; align-items: center; justify-content: center; }
+        .mine-tile:hover:not(.flipped) { border-color: var(--click-color); }
+        .mine-tile.flipped { transform: rotateY(180deg); cursor: default; }
+        .tile-front, .tile-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; text-align: center; padding: 2px; box-sizing: border-box;}
+        .tile-front { background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2"><path d="M2 12l5.25 5 2.625-3M8 17l5.25-5 2.625 3M14 12l5.25-5 2.625 3"/></svg>') center no-repeat; }
+        .tile-back { transform: rotateY(180deg); flex-direction: column; }
+        .r-norm { background: #334155; border: 2px solid #64748b; color: white;}
+        .r-rare { background: #1e3a8a; border: 2px solid #3b82f6; color: #93c5fd;}
+        .r-epic { background: #4a044e; border: 2px solid #a855f7; color: #e9d5ff; box-shadow: 0 0 10px #a855f7;}
+        .r-leg { background: #452e04; border: 2px solid #eab308; color: #fef08a; box-shadow: 0 0 15px #eab308;}
+        .mine-summary { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius-md); z-index: 20; text-align: center; padding: 20px;}
+
+        /* EVENTS & PROGRESS BARS */
+        .prog-bar-bg { background: rgba(0,0,0,0.6); width: 100%; height: 8px; border-radius: 4px; margin-top: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);}
+        .prog-bar-fill { background: var(--coin-color); height: 100%; width: 0%; transition: width 0.4s ease-out; border-radius: 4px;}
+        .golden-core, .epic-core { position: absolute; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px;}
+        .golden-core { background: radial-gradient(circle, #fef08a, #ca8a04); box-shadow: 0 0 30px #eab308; color: #452e04; animation: pulseGC 0.8s infinite; }
+        .epic-core { background: radial-gradient(circle, #e9d5ff, #7e22ce); box-shadow: 0 0 30px #a855f7; color: #3b0764; animation: pulseEC 1s infinite; font-size: 14px;}
+        @keyframes pulseGC { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        @keyframes pulseEC { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        #notif-area { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 5px; z-index: 200; pointer-events: none;}
+        .notif { background: rgba(0,0,0,0.9); border: 2px solid var(--coin-color); padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; animation: fadeUp 3.5s forwards; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 10% { opacity: 1; transform: translateY(0); } 90% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-30px); } }
+        .float-txt { position: absolute; font-weight: 800; font-size: 16px; pointer-events: none; animation: floatUp 1s ease-out forwards; text-align: center; z-index: 100; text-shadow: 0 2px 4px rgba(0,0,0,0.8);}
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0px) scale(0.8); } 100% { opacity: 0; transform: translateY(-50px) scale(1.1); } }
+
+        /* SKILL TREE */
+        .skill-node { background: rgba(0,0,0,0.6); border: 2px solid #475569; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; margin: 5px auto; transition: 0.3s;}
+        .skill-node.active-skill { border-color: #4ade80; box-shadow: 0 0 15px #4ade80; }
+        .skill-node:hover { transform: scale(1.1); border-color: var(--gem-color);}
+
+        /* MODAL (Offline) */
+        #offline-modal { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center;}
+        .modal-content { background: var(--panel-bg); padding: 30px; border-radius: 16px; border: 2px solid var(--click-color); text-align: center; max-width: 400px;}
+        
+        /* SETTINGS LOG */
+        .log-box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; font-size: 11px; font-family: monospace; color: #a3e635; border: 1px solid #3f6212; overflow-y: auto; max-height: 200px;}
+        
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+    <div id="timeskip-flash"></div>
+    <div id="notif-area"></div>
+
+    <!-- OFFLINE MODAL -->
+    <div id="offline-modal">
+        <div class="modal-content">
+            <h2 style="color: var(--click-color)">Welcome Back, Miner!</h2>
+            <p style="color: var(--text-muted)">Your automated systems were running while you were asleep.</p>
+            <p>Time Away: <strong id="off-time">0</strong></p>
+            <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <h3 style="margin-top:0;">Gains Collected:</h3>
+                <p style="color: var(--click-color); font-weight: bold; margin: 5px 0;">+<span id="off-clicks">0</span> Clicks</p>
+                <p style="color: var(--coin-color); font-weight: bold; margin: 5px 0;">+<span id="off-coins">0</span> Coins</p>
+            </div>
+            <button class="btn-act" onclick="document.getElementById('offline-modal').style.display='none'">Collect & Play</button>
+        </div>
+    </div>
+
+    <!-- LEFT PANEL -->
+    <div id="left-panel" class="panel">
+        <h2 style="font-size: 22px; text-align: center; color: var(--click-color); text-shadow: 0 0 10px var(--click-color);">DASHBOARD</h2>
+        <div class="grid-2">
+            <div class="stat-box"><span>Clicks</span><span id="v-click" class="stat-val color-clicks">0</span></div>
+            <div class="stat-box"><span>Coins</span><span id="v-coin" class="stat-val color-coins">0</span></div>
+            <div class="stat-box"><span>Gems</span><span id="v-gem" class="stat-val color-gems">0</span></div>
+            <div class="stat-box" style="border-color: var(--gem-color)"><span>Rebirths</span><span id="v-rebirth" class="stat-val color-gems">0/5</span></div>
+        </div>
+
+        <h3 style="margin-top: 15px; font-size: 14px;">Live Stats</h3>
+        <p style="font-size: 12px; margin: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px;">Click Power: <strong id="v-pwr" style="color: white">1</strong></p>
+        <p style="font-size: 12px; margin: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px;">Global Multiplier: <strong id="v-mult" style="color: #4ade80">x1</strong></p>
+        <p style="font-size: 12px; margin: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px;">Coin Chance: <strong class="color-coins" id="v-chance">5%</strong></p>
+        <p style="font-size: 12px; margin: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px;">Gem Chance: <strong class="color-gems" id="v-gemc">0.00001%</strong></p>
+        <p style="font-size: 12px; margin: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px;">Material Chance: <strong class="color-mat" id="v-matc">1.5%</strong></p>
+        <p style="font-size: 12px; margin: 3px 0;">Auto Clicks/Sec: <strong id="v-cps" class="color-clicks">0</strong></p>
+        
+        <h3 style="margin-top: 20px; font-size: 14px;">Active Abilities</h3>
+        <div id="v-abilities" style="font-size: 11px; color: var(--text-muted);">None active.</div>
+
+        <h3 style="margin-top: 20px; font-size: 14px;">Equipped Gear</h3>
+        <div id="v-pet" style="font-size: 11px; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px; margin-bottom: 5px;">Pet: None</div>
+        <div id="v-equip" style="font-size: 11px; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px;">Pick/Aura: None</div>
+    </div>
+
+    <!-- CENTER PANEL -->
+    <div id="center-panel">
+        <h1 style="position: absolute; top: 20px; font-weight: 900; font-size: 38px; text-shadow: 0 0 20px var(--click-color); letter-spacing: 2px;">NEON CORE</h1>
+        
+        <div id="corrupt-ui">
+            <h2>🚨 CORRUPTION DETECTED 🚨</h2>
+            <p>AUTOCLICKERS OFFLINE. COINS DRAINING.</p>
+            <h1 style="font-size: 40px; margin: 5px;">PURIFY: <span id="crpt-clicks">0</span>/100</h1>
+            <p>Time Remaining: <span id="crpt-time">15</span>s</p>
+        </div>
+
+        <div class="scene" id="main-scene" onclick="clickCore(event)">
+            <div class="cube" id="main-cube"><div class="cube-face front">⚡</div><div class="cube-face back">⚡</div><div class="cube-face right">⚡</div><div class="cube-face left">⚡</div><div class="cube-face top">⚡</div><div class="cube-face bottom">⚡</div></div>
+        </div>
+        
+        <div id="combo-container">
+            <div id="combo-txt"></div>
+            <div class="combo-bar-bg"><div id="combo-fill"></div></div>
+            <div style="font-size: 10px; color: #aaa; margin-top: 5px;">Max Combo: <span id="v-max-combo">500</span></div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div id="right-panel" class="panel">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="sTab('t-upg')">Upgrades</button>
+            <button class="tab-btn" onclick="sTab('t-quest')">Quests</button>
+            <button class="tab-btn" onclick="sTab('t-inv')">Inventory</button>
+            <button class="tab-btn" onclick="sTab('t-craft')">Crafting</button>
+            <button class="tab-btn" onclick="sTab('t-forge')" style="color:var(--dm-color)">The Forge</button>
+            <button class="tab-btn" onclick="sTab('t-mine')">Mining</button>
+            <button class="tab-btn" onclick="sTab('t-shop')">Shop</button>
+            <button class="tab-btn" onclick="sTab('t-rebirth')" style="color:var(--gem-color)">Cosmic</button>
+            <button class="tab-btn" onclick="sTab('t-set')">⚙️</button>
+        </div>
+
+        <!-- UPGRADES -->
+        <div id="t-upg" class="tab-content active"><div id="c-upg"></div></div>
+        <!-- QUESTS -->
+        <div id="t-quest" class="tab-content"><div id="c-quest"></div></div>
+
+        <!-- MINIGAME -->
+        <div id="t-mine" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                <div><h3 style="margin:0; border:none;">Core Mining</h3><p style="margin:0; font-size:11px; color:var(--text-muted);">Cost: 20 Coins.</p></div>
+                <button id="btn-start-mine" class="btn-act" style="width: auto; margin:0;" onclick="startMine()">Play (20 Coins)</button>
+            </div>
+            <div style="text-align: center; margin-top: 10px; font-size: 13px; font-weight: bold;">Status: <span id="mine-status" style="color: var(--click-color)">Ready</span> | Picks: <span id="mine-picks">0</span></div>
+            <div style="position: relative;">
+                <div class="mine-grid" id="mine-grid"></div>
+                <div class="mine-summary" id="mine-summary" style="display: none;">
+                    <h3 style="color: var(--coin-color)">Mining Complete!</h3>
+                    <div id="mine-loot" style="font-size: 13px; margin: 15px 0; line-height: 1.6;"></div>
+                    <button class="btn-act" onclick="closeMineSummary()">Collect & Reset</button>
+                </div>
+            </div>
+            <div class="cat-header">Mining Upgrades</div>
+            <div id="c-mine-upg"></div>
+        </div>
+
+        <!-- INVENTORY -->
+        <div id="t-inv" class="tab-content">
+            <div class="cat-header">Materials & Dark Matter</div>
+            <div class="grid-2">
+                <div class="stat-box"><span>Scrap</span><span id="i-scrap" class="stat-val color-mat">0</span></div>
+                <div class="stat-box"><span>Magic Dust</span><span id="i-dust" class="stat-val color-mat">0</span></div>
+                <div class="stat-box"><span>Star Shard</span><span id="i-shard" class="stat-val color-mat">0</span></div>
+                <div class="stat-box"><span>Void Matter</span><span id="i-void" class="stat-val color-mat">0</span></div>
+            </div>
+            <div class="stat-box" style="border-color: var(--dm-color); margin-bottom: 15px;"><span>Dark Matter</span><span id="i-dm" class="stat-val color-dm">0</span></div>
+            
+            <div class="cat-header">Unopened Eggs</div>
+            <div id="c-eggs"></div>
+            
+            <div class="cat-header">Your Pets (1 Equippable)</div>
+            <button class="btn-act" onclick="autoFusePets()" style="background: #a855f7; margin-bottom: 10px;">✨ Auto-Fuse Identical Pets (x3)</button>
+            <div id="c-pets"></div>
+            
+            <div class="cat-header">Equipment & Themes</div>
+            <div id="c-equip-inv"></div>
+            <div id="c-inv-themes"></div>
+        </div>
+
+        <!-- CRAFTING -->
+        <div id="t-craft" class="tab-content">
+            <p style="font-size: 11px; color: var(--text-muted);">Craft Eggs. Open them in Inventory to get Pets!</p>
+            <div id="active-craft" class="card" style="display: none; border-left-color: #a78bfa;">
+                <h4>Incubating Egg...</h4>
+                <div class="prog-bar-bg"><div class="prog-bar-fill" id="craft-bar" style="background: var(--mat-color);"></div></div>
+                <p style="text-align: center; margin-top: 5px;">Time remaining: <span id="craft-time" style="color: white; font-weight: bold;">--:--</span></p>
+                <button class="btn-act" id="btn-skip" onclick="skipCraft()" style="background: var(--coin-color); color: #000;">Skip</button>
+            </div>
+            <div id="craft-opts">
+                <div class="card"><h4>🥚 Common Egg</h4><p>35 Scrap, 2 Dust, 2k Clicks</p><button class="btn-act" id="btn-cr-com" onclick="startCraft('Common')">Craft (2m)</button></div>
+                <div class="card"><h4>🥚 Uncommon Egg</h4><p>80 Scrap, 5 Dust, 1 Shard, 8k Clicks</p><button class="btn-act" id="btn-cr-unc" onclick="startCraft('Uncommon')">Craft (5m)</button></div>
+                <div class="card"><h4>🥚 Rare Egg</h4><p>200 Scrap, 15 Dust, 3 Shards, 50k Clicks</p><button class="btn-act" id="btn-cr-rar" onclick="startCraft('Rare')">Craft (15m)</button></div>
+                <div class="card"><h4>🥚 Epic Egg</h4><p>500 Scrap, 35 Dust, 5 Shards, 1.25M Clicks</p><button class="btn-act" id="btn-cr-epi" onclick="startCraft('Epic')">Craft (45m)</button></div>
+                <div class="card" style="border-left-color: var(--gem-color);"><h4>🥚 Legendary Egg</h4><p>800 Scrap, 100 Dust, 20 Shards, 1 Void, 5M Clicks</p><button class="btn-act" id="btn-cr-leg" onclick="startCraft('Legendary')" style="background: var(--gem-color);">Craft (2h)</button></div>
+            </div>
+        </div>
+
+        <!-- THE FORGE (Dark Matter & Gear) -->
+        <div id="t-forge" class="tab-content">
+            <div style="text-align: center; padding: 15px; border: 1px solid var(--dm-color); background: rgba(239, 68, 68, 0.1); border-radius: 8px; margin-bottom: 15px;">
+                <h3 style="color: var(--dm-color); text-shadow: 0 0 10px #ef4444; margin:0;">THE SCRAP FORGE</h3>
+                <p style="font-size: 11px; margin: 5px 0;">Burn 10,000 Scrap to synthesize 1 Dark Matter.</p>
+                <button class="btn-act" onclick="forgeDarkMatter()" style="background: var(--dm-color); color: white;">Synthesize Dark Matter</button>
+            </div>
+            
+            <div class="cat-header" style="border-color: var(--dm-color); color: var(--dm-color)">Dark Matter Upgrades</div>
+            <div class="card" style="border-left-color: var(--dm-color)">
+                <h4>Combo Extension <span class="badge" id="dm-upg-combo">Lvl 0/5</span></h4>
+                <p>Increases Max Combo by +100 per level.</p>
+                <button class="btn-act" id="btn-dm-combo" onclick="buyDMUpg('combo')" style="background: var(--dm-color); color:white;">Cost: 1 DM</button>
+            </div>
+
+            <div class="cat-header">Equipment Crafting</div>
+            <div class="card">
+                <h4>⛏️ Void Pickaxe (Equippable)</h4>
+                <p>Grants +2 extra picks in the Minigame.</p>
+                <button class="btn-act" id="btn-eq-pick" onclick="craftEquip('pick')">Craft (5 Void, 50k Clicks)</button>
+            </div>
+            <div class="card">
+                <h4>🔮 Magnetic Aura (Equippable)</h4>
+                <p>Reduces Core spawn timers by 30 seconds.</p>
+                <button class="btn-act" id="btn-eq-aura" onclick="craftEquip('aura')">Craft (100 Shards, 10k Coins)</button>
+            </div>
+        </div>
+
+        <!-- SHOP / ARTIFACTS / THEMES -->
+        <div id="t-shop" class="tab-content">
+            <div class="cat-header">Automation</div>
+            <div class="card" id="card-auto" style="border-left-color: var(--click-color)"><h4>Base Autoclicker</h4><p>Unlocks Autoclicker Upgrades.</p><button class="btn-act" id="b-shop-auto" onclick="buyShopItem('auto')">Buy: 75 Coins</button></div>
+            <div class="card" id="card-goldauto" style="border-left-color: var(--coin-color)"><h4>Golden Autoclicker</h4><p style="color:var(--coin-color)">2x Autoclicker speed!</p><button class="btn-act" id="b-shop-gold" onclick="buyShopItem('gold')" style="background:var(--coin-color); color:#000;">Buy: 1 Gem</button></div>
+
+            <div class="cat-header" style="border-color: #64748b; color: #94a3b8;">The Black Market</div>
+            <div class="card" style="border-left-color: #64748b">
+                <h4>Shady Deals</h4>
+                <p style="font-size: 11px;">Instant resource exchanges.</p>
+                <div class="grid-2" style="margin-bottom: 0;">
+                    <button class="btn-act" onclick="tradeBM('dust')" style="background: #475569; color:white; font-size:10px;">500 Scrap -> 5 Dust</button>
+                    <button class="btn-act" onclick="tradeBM('void')" style="background: #475569; color:white; font-size:10px;">100 Dust -> 1 Void</button>
+                    <button class="btn-act" onclick="tradeBM('gem')" style="background: #475569; color:white; font-size:10px; grid-column: span 2;">250,000 Coins -> 1 Gem</button>
+                </div>
+            </div>
+
+            <div class="cat-header">Artifacts (Gems)</div>
+            <div class="card" style="border-left-color: var(--gem-color)"><h4>Time Relic</h4><p>Speeds up crafting by 20%.</p><button class="btn-act" id="b-art-time" onclick="buyArt('time')" style="background: var(--gem-color)">Buy: 2 Gems</button></div>
+            <div class="card" style="border-left-color: var(--gem-color)"><h4>Core Magnet</h4><p>Doubles Core spawn rates.</p><button class="btn-act" id="b-art-mag" onclick="buyArt('magnet')" style="background: var(--gem-color)">Buy: 5 Gems</button></div>
+            
+            <div class="cat-header">Theme Blueprints</div>
+            <div id="c-themes"></div>
+        </div>
+
+        <!-- REBIRTH & SKILL TREE -->
+        <div id="t-rebirth" class="tab-content">
+            <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+                <h3 style="color: var(--gem-color); font-size: 24px; margin-bottom: 5px;">Cosmic Rebirth <span id="reb-lvl">0/5</span></h3>
+                <p style="font-size: 11px; margin:0; color: #ccc;">Reset Quests, Clicks, Coins, and Materials.<br>KEEP Gems, Pets, Artifacts, Gear, Shop Unlocks, Themes, and Dark Matter.</p>
+                <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; font-size: 12px; margin: 10px 0; text-align: left;">
+                    <strong>Next Rebirth Requires:</strong> <span id="req-txt"></span>
+                </div>
+                <button class="btn-act" id="btn-reb" onclick="doRebirth()" style="background: var(--gem-color); font-size: 14px; padding: 12px;"></button>
+            </div>
+            
+            <h3 style="margin-top: 15px; text-align: center;">Cosmic Skill Tree</h3>
+            <p style="text-align: center; font-size: 13px; color: var(--gem-color); font-weight: bold;">Unspent Cosmic Points: <span id="v-cp" style="font-size: 18px;">0</span></p>
+            
+            <div class="card" style="border-left-color: #fde047; margin-top: 15px;">
+                <h4 style="color: #fde047; font-size: 16px;">🎲 Golden Dice <span class="badge" id="sk-gd-lvl">Lvl 0/6</span></h4>
+                <p id="sk-gd-desc" style="font-size: 12px; color: #fff;">Turns dice golden periodically, massively boosting all stats temporarily.</p>
+                <button class="btn-act" id="btn-sk-gd" onclick="upgradeSkill('gd')" style="background: #fde047; color: #000;"></button>
+            </div>
+
+            <div class="card" style="border-left-color: #e9d5ff;">
+                <h4 style="color: #e9d5ff; font-size: 16px;">⏳ Timeskip <span class="badge" id="sk-ts-lvl">Lvl 0/6</span></h4>
+                <p id="sk-ts-desc" style="font-size: 12px; color: #fff;">Periodically skips time, granting you minutes worth of automated resources instantly.</p>
+                <button class="btn-act" id="btn-sk-ts" onclick="upgradeSkill('ts')" style="background: #e9d5ff; color: #000;"></button>
+            </div>
+        </div>
+
+        <!-- SETTINGS & LOG -->
+        <div id="t-set" class="tab-content">
+            <div class="cat-header">Exact Drop Chances</div>
+            <div class="card">
+                <p><strong>Base Coin Chance:</strong> 5.00%</p>
+                <p><strong>Base Mat Chance:</strong> 1.50%</p>
+                <p><strong>Base Gem Chance:</strong> 0.00001%</p>
+                <p><strong>Raw Click Drops:</strong> 0.5% for 2 Coins, 0.05% for 10 Coins.</p>
+                <p><strong>Minigame Odds:</strong> 79% Norm, 15% Rare, 5% Epic, 1% Leg.</p>
+            </div>
+            
+            <div class="cat-header">System</div>
+            <button class="btn-act" onclick="saveGame()" style="background: #4ade80; color: #000;">Force Save Game</button>
+            <button class="btn-act" onclick="wipeSave()" style="background: #ef4444; color: #fff;">HARD RESET (Wipe All)</button>
+
+            <div class="cat-header">Update Log</div>
+            <div class="log-box">
+                <p><strong>[V6] The Singularity (Current)</strong><br>- Added Core Corruption Boss Fights.<br>- Added The Forge & Dark Matter.<br>- Added Equipment Slots (Pickaxe/Aura).<br>- Added Offline Progress.<br>- Added Pet Auto-Fusion System.<br>- Added Dynamic Combo Decay.<br>- Added Golden Core Pity Timer.<br>- Added Black Market.</p>
+                <p><strong>[V5] The Grand Expansion</strong><br>- Epic/Golden Cores.<br>- Egg Crafting Gacha.<br>- UI Categories.<br>- Cosmic Skills.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- AUDIO SYSTEM ---
+        let actx = null;
+        function initAudio() { if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if(actx.state === 'suspended') actx.resume(); }
+        function playSnd(type) {
+            if(!actx) return; let osc = actx.createOscillator(); let gain = actx.createGain(); osc.connect(gain); gain.connect(actx.destination); let now = actx.currentTime;
+            if(type === 'click') { osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(300, now+0.1); gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.1); osc.start(now); osc.stop(now+0.1); } 
+            else if(type === 'coin') { osc.type = 'triangle'; osc.frequency.setValueAtTime(1200, now); gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.3); osc.start(now); osc.stop(now+0.3); } 
+            else if(type === 'gem') { osc.type = 'square'; osc.frequency.setValueAtTime(800, now); osc.frequency.linearRampToValueAtTime(1600, now+0.2); osc.frequency.linearRampToValueAtTime(2000, now+0.4); gain.gain.setValueAtTime(0.08, now); gain.gain.linearRampToValueAtTime(0, now+0.5); osc.start(now); osc.stop(now+0.5); } 
+            else if(type === 'mine') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now); osc.frequency.exponentialRampToValueAtTime(50, now+0.2); gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.2); osc.start(now); osc.stop(now+0.2); }
+            else if(type === 'magic') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(800, now+0.5); gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now+0.6); osc.start(now); osc.stop(now+0.6); }
+            else if(type === 'boss') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.linearRampToValueAtTime(50, now+1.0); gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0, now+1.0); osc.start(now); osc.stop(now+1.0); }
+        }
+
+        // --- GAME DATA ---
+        let game = {
+            curr: { clicks: 0, coins: 0, gems: 0, cp: 0, dm: 0 },
+            mats: { scrap: 0, dust: 0, shard: 0, void: 0 },
+            stat: { playtime: 0, tClicks: 0, rebirths: 0, mult: 1, bestCombo: 0, corruptsCleared: 0 },
+            base: { coin: 0.05, mat: 0.015, gem: 0.0000001 },
+            upg: { pwr: 0, clickMult: 0, coinClick: 0, coin: 0, pass: 0, auto: 0, mat: 0 },
+            mineUpg: { cd: 0, loot: 0 },
+            forgeUpg: { combo: 0 },
+            shop: { auto: false, goldAuto: false, themes: ['default'], eqTheme: 'default', arts: { time: false, magnet: false } },
+            equipInv: { pick: false, aura: false }, equipEq: { pick: false, aura: false },
+            pets: { eggs: [], inv: [], eq: null },
+            craft: { active: false, type: null, start: 0, end: 0 },
+            quest: { time: 0, click: 0, pwr: 0, minigame: 0, mats: 0 },
+            mine: { active: false, cd: 0, picks: 0, loot: { coin:0, scrap:0, dust:0, shard:0, void:0, gem:0 } },
+            skills: { gd: 0, ts: 0 },
+            timers: { gc: 0, gd: 0, ts: 0, lastGcDrop: Date.now() },
+            activeAbils: { gdEnd: 0 },
+            corrupt: { active: false, clicks: 0, end: 0, cd: Date.now() + 300000 },
+            lastSave: Date.now()
+        };
+
+        let combo = 0; let lastManClick = 0;
+
+        // --- DATABASES ---
+        const clickCoinCosts = [2500, 20000, 150000, 1000000, 5000000, 15000000, 35000000, 60000000, 85000000, 100000000];
+
+        const upgDB = {
+            pwr: { cat: "Click Modifiers", n: "Power Click", d: "+1 Base Click.", cType: "coins", c: 2, m: 1.5, mx: 999 },
+            clickMult: { cat: "Click Modifiers", n: "Click Synergy", d: "+1.05x Multiplier to Clicks.", cType: "clicks", c: 1000, m: 3.0, mx: 20 },
+            coinClick: { cat: "Click Modifiers", n: "Clicker's Luck", d: "+1% Coin chance.", cType: "clicks", cArr: clickCoinCosts, mx: 10 },
+            coin: { cat: "Passive Generation", n: "Coin Detector", d: "+1% Coin chance.", cType: "coins", c: 25, m: 2.5, mx: 10 },
+            pass: { cat: "Passive Generation", n: "Coin Mint", d: "+1 Coin/min.", cType: "coins", c: 25, m: 2.0, mx: 999 },
+            auto: { cat: "Passive Generation", n: "Autoclicker", d: "+1 Click/sec.", cType: "coins", c: 100, m: 3.0, mx: 20 },
+            mat: { cat: "Utility", n: "Material Radar", d: "+10% mat drop chance.", cType: "coins", c: 200, m: 2.5, mx: 5 }
+        };
+
+        const mineUpgDB = { cd: { n: "Mining License", d: "-1 min Cooldown.", req: { coins: 500, scrap: 100 }, m: 2, mx: 5 }, loot: { n: "Deep Drill", d: "+20% Loot generated.", req: { clicks: 50000, dust: 15 }, m: 3, mx: 5 } };
+        const questDB = { time: { cat: "Playtime", n: "Time is Money", d: "Play (secs)", t: [300, 1800, 3600, 7200], r: [5, 10, 20, 50], c: () => game.stat.playtime }, click: { cat: "Activity", n: "Manual Labor", d: "Clicks", t: [1000, 10000, 50000], r: [5, 15, 30], c: () => game.stat.tClicks }, minigame: { cat: "Activity", n: "Miner", d: "Play Minigame", t: [1, 5, 15], r: [10, 25, 50], c: () => game.quest.minigame }, mats: { cat: "Gathering", n: "Scavenger", d: "Collect Scrap", t: [50, 250, 1000], r: [10, 20, 50], c: () => game.mats.scrap } };
+        const themeDB = { 'default': { n: "Default Void", cType: "coins", c: 0, reqMat: null, mCost: 0, b: "None", css: "border-color: #475569;" }, 'green': { n: "Emerald Matrix", cType: "coins", c: 50, reqMat: 'scrap', mCost: 25, b: "+1 Pwr", css: "border-color: #34d399;" }, 'water': { n: "Deep Ocean", cType: "coins", c: 300, reqMat: 'dust', mCost: 5, b: "+2% Coin", css: "border-color: #38bdf8;" }, 'glitter': { n: "Pink Glitter", cType: "coins", c: 350, reqMat: 'dust', mCost: 10, b: "+3 Pwr", css: "border-color: #f472b6;" }, 'gold': { n: "Golden Majesty", cType: "gems", c: 10, reqMat: 'shard', mCost: 5, b: "+25 Pwr, +5% Coin", css: "border-color: #eab308; background: rgba(234, 179, 8, 0.1);" }, 'void': { n: "Abyssal Void", cType: "gems", c: 25, reqMat: 'void', mCost: 2, b: "+100 Pwr, +10% Coin", css: "border-color: #c084fc; background: rgba(0, 0, 0, 0.8);" } };
+        const craftDB = { 'Common': { t: 2, c: 2000, s: 35, d: 2, sh: 0, v: 0 }, 'Uncommon': { t: 5, c: 8000, s: 80, d: 5, sh: 1, v: 0 }, 'Rare': { t: 15, c: 50000, s: 200, d: 15, sh: 3, v: 0 }, 'Epic': { t: 45, c: 1250000, s: 500, d: 35, sh: 5, v: 0 }, 'Legendary': { t: 120, c: 5000000, s: 800, d: 100, sh: 20, v: 1 } };
+        const rebReq = [ { c: 5000, v: 1, a: 2, m: 2 }, { c: 20000, v: 3, a: 5, m: 5 }, { c: 100000, v: 8, a: 10, m: 15 }, { c: 500000, v: 20, a: 15, m: 50 }, { c: 2500000, v: 50, a: 20, m: 200 } ];
+
+        const gdLevels = [ { cd: 0, dur: 0, cM: 1, cnM: 1, gM: 1, mM: 1 }, { cd: 8*60, dur: 30, cM: 5, cnM: 2, gM: 50, mM: 3, cst: 1 }, { cd: 7.5*60, dur: 33, cM: 5.5, cnM: 2.2, gM: 60, mM: 3.4, cst: 1 }, { cd: 7*60, dur: 36, cM: 6, cnM: 2.4, gM: 70, mM: 3.8, cst: 1 }, { cd: 6.5*60, dur: 39, cM: 6.5, cnM: 2.6, gM: 80, mM: 4.2, cst: 1 }, { cd: 6*60, dur: 42, cM: 7, cnM: 2.8, gM: 90, mM: 4.6, cst: 1 }, { cd: 5*60, dur: 45, cM: 8, cnM: 3, gM: 100, mM: 5, cst: 1 } ];
+        const tsLevels = [ { cd: 0, sMins: 0, cps: 0 }, { cd: 15*60, sMins: 5, cps: 3, cst: 1 }, { cd: 13.5*60, sMins: 5.4, cps: 3.4, cst: 1 }, { cd: 12*60, sMins: 5.8, cps: 3.8, cst: 1 }, { cd: 10.5*60, sMins: 6.2, cps: 4.2, cst: 1 }, { cd: 9*60, sMins: 6.6, cps: 4.6, cst: 1 }, { cd: 8*60, sMins: 7, cps: 5, cst: 1 } ];
+
+        // --- SAVING, LOADING, OFFLINE ---
+        function saveGame() { game.lastSave = Date.now(); localStorage.setItem('cosmicMinerV6', JSON.stringify(game)); }
+        function loadGame() {
+            let s = localStorage.getItem('cosmicMinerV6');
+            if(s) {
+                try {
+                    let p = JSON.parse(s);
+                    Object.keys(game).forEach(k => { if(p[k] !== undefined) Object.assign(game[k], p[k]); });
+                    document.body.className = `theme-${game.shop.eqTheme}`;
+                    
+                    // Offline Progress Eval
+                    let now = Date.now();
+                    let diffSecs = Math.floor((now - game.lastSave) / 1000);
+                    if(diffSecs > 60) {
+                        let cpm = game.upg.pass * getMult(); 
+                        let spd = game.upg.auto * getMult(); if(game.shop.goldAuto) spd *= 2;
+                        
+                        let offCoins = (cpm/60) * diffSecs;
+                        let offClicks = spd * diffSecs * getPwr();
+                        
+                        if(offCoins > 0 || offClicks > 0) {
+                            game.curr.coins += offCoins; game.curr.clicks += offClicks; game.stat.tClicks += offClicks;
+                            
+                            let h = Math.floor(diffSecs/3600); let m = Math.floor((diffSecs%3600)/60);
+                            document.getElementById('off-time').innerText = `${h}h ${m}m`;
+                            document.getElementById('off-clicks').innerText = fNum(offClicks);
+                            document.getElementById('off-coins').innerText = fNum(offCoins);
+                            document.getElementById('offline-modal').style.display = 'flex';
+                        }
+                    }
+                } catch(e) { console.error(e); }
+            }
+        }
+        function wipeSave() { if(confirm("HARD RESET? You will lose absolutely everything. Cannot be undone.")) { localStorage.clear(); location.reload(); } }
+
+        // --- HELPERS ---
+        function fNum(n) { if(n>=1e9) return (n/1e9).toFixed(2)+'B'; if(n>=1e6) return (n/1e6).toFixed(2)+'M'; if(n>=1e3) return (n/1e3).toFixed(1)+'k'; return Math.floor(n); }
+        function notif(msg) { let e=document.createElement('div'); e.className='notif'; e.innerHTML=msg; document.getElementById('notif-area').appendChild(e); setTimeout(()=>e.remove(),3500); }
+        function fTxt(x,y,h) { let e=document.createElement('div'); e.className='float-txt'; e.innerHTML=h; e.style.left=(x-20+(Math.random()*40-20))+'px'; e.style.top=(y-40)+'px'; document.body.appendChild(e); setTimeout(()=>e.remove(),1000); }
+        function isGD() { return Date.now() < game.activeAbils.gdEnd; }
+        function getMult() { return game.stat.mult; }
+        
+        function getPwr() { 
+            let base = 1 + game.upg.pwr;
+            if(game.shop.eqTheme === 'green') base += 1; if(game.shop.eqTheme === 'glitter') base += 3; 
+            if(game.shop.eqTheme === 'gold') base += 25; if(game.shop.eqTheme === 'void') base += 100;
+            if(game.pets.eq && game.pets.eq.p) base += game.pets.eq.p;
+            let comboMult = 1.0 + Math.min(500 + (game.forgeUpg.combo*100), combo) * 0.01;
+            let upgMult = Math.pow(1.05, game.upg.clickMult);
+            let finalPwr = base * getMult() * comboMult * upgMult;
+            if(isGD()) finalPwr *= gdLevels[game.skills.gd].cM;
+            return Math.max(1, Math.floor(finalPwr));
+        }
+
+        function getCoinC() {
+            let c = game.base.coin + (game.upg.coin * 0.01) + (game.upg.coinClick * 0.01) + (game.skills.s2 ? 0.02 : 0);
+            if(game.shop.eqTheme === 'water') c += 0.02; if(game.shop.eqTheme === 'gold') c += 0.05; if(game.shop.eqTheme === 'void') c += 0.10;
+            if(game.pets.eq && game.pets.eq.c) c += (game.pets.eq.c/100); 
+            if(isGD()) c *= gdLevels[game.skills.gd].cnM; return c;
+        }
+
+        function getGemC() { let g = game.base.gem; if(isGD()) g *= gdLevels[game.skills.gd].gM; return g; }
+        function getMatC() { let m = game.base.mat * (1 + (game.upg.mat*0.1)); if(isGD()) m *= gdLevels[game.skills.gd].mM; return m; }
+
+        // --- CORE CLICK & CORRUPTION ---
+        function clickCore(e) { 
+            let now = Date.now();
+            if(now - lastManClick < 100) return; 
+            
+            if(game.corrupt.active) {
+                game.corrupt.clicks++;
+                let html = `<span style="color:#ef4444; font-weight:bold; font-size:24px;">HIT!</span>`;
+                fTxt(e.clientX, e.clientY, html); playSnd('click');
+                document.getElementById('crpt-clicks').innerText = game.corrupt.clicks;
+                
+                if(game.corrupt.clicks >= 100) {
+                    game.corrupt.active = false; game.stat.corruptsCleared++; playSnd('gem');
+                    game.curr.gems += 5; game.mats.void += 1;
+                    document.getElementById('main-scene').classList.remove('corrupted');
+                    document.getElementById('corrupt-ui').style.display = 'none';
+                    notif("✨ CORE PURIFIED! +5 Gems, +1 Void Matter! ✨");
+                }
+                return;
+            }
+
+            if(now - lastManClick < 1200) { combo = Math.min(combo + 1, 500 + (game.forgeUpg.combo*100)); } else { combo = 1; }
+            if(combo > game.stat.bestCombo) game.stat.bestCombo = combo;
+            lastManClick = now;
+            
+            let mxC = 500 + (game.forgeUpg.combo*100);
+            let mtr = document.getElementById('combo-fill'); mtr.style.width = (combo/mxC)*100 + '%';
+            let txt = document.getElementById('combo-txt');
+            txt.innerText = combo > 4 ? `${combo}x Combo! [x${(1.0 + combo*0.01).toFixed(2)}]` : '';
+            
+            trgClick(e.clientX, e.clientY, true); playSnd('click'); 
+        }
+
+        function trgClick(x, y, isMan) {
+            let clk = getPwr(); game.curr.clicks += clk; game.stat.tClicks += clk;
+            let html = `<span class="color-clicks">+${clk}</span>`;
+
+            if(Math.random() < getCoinC()) { let cG = 1 * getMult(); game.curr.coins += cG; html += `<br><span class="color-coins">+${cG} Coin</span>`; if(isMan) playSnd('coin'); }
+            if(Math.random() < 0.005) { game.curr.coins += 2; html += `<br><span class="color-coins">+2 Coins!</span>`; } 
+            else if(Math.random() < 0.0005) { game.curr.coins += 10; html += `<br><span class="color-coins" style="font-size:20px;">+10 Coins!!</span>`; }
+            if(Math.random() < getGemC()) { game.curr.gems++; html += `<br><span class="color-gems">+1 GEM!</span>`; if(isMan) playSnd('gem'); }
+
+            if(isMan && Math.random() < getMatC()) {
+                let r = Math.random();
+                if(r<0.005) { game.mats.void++; html+=`<br><span class="color-mat">Void!</span>`; } 
+                else if(r<0.03) { game.mats.shard++; html+=`<br><span class="color-mat">Shard!</span>`; }
+                else if(r<0.15) { game.mats.dust++; html+=`<br><span class="color-mat">Dust!</span>`; }
+                else { game.mats.scrap++; html+=`<br><span class="color-mat">Scrap</span>`; }
+            }
+
+            if(isMan && x && y) fTxt(x, y, html);
+            chkQuest(); forceUI(); 
+        }
+
+        function triggerCorruption() {
+            if(game.corrupt.active) return;
+            game.corrupt.active = true; game.corrupt.clicks = 0; game.corrupt.end = Date.now() + 15000;
+            document.getElementById('main-scene').classList.add('corrupted');
+            document.getElementById('corrupt-ui').style.display = 'block';
+            document.getElementById('crpt-clicks').innerText = 0;
+            playSnd('boss'); notif("🚨 WARNING: CORE CORRUPTION! 🚨");
+        }
+
+        // --- CORES ---
+        function trgCore() {
+            game.timers.lastGcDrop = Date.now();
+            let isEpic = Math.random() < 0.65; let core = document.createElement('div');
+            let m=1, cR=[5,15], gC=0.0025, lbl="", type="Golden";
+            
+            if(isEpic) { core.className = 'epic-core'; lbl = "Epic!"; type="Epic"; } 
+            else {
+                core.className = 'golden-core'; let r=Math.random();
+                if(r<0.01) { m=20; cR=[100,250]; gC=0.04; lbl="20x"; }
+                else if(r<0.05) { m=5; cR=[50,100]; gC=0.01; lbl="5x"; }
+                else if(r<0.20) { m=3; cR=[35,50]; gC=0.0075; lbl="3x"; }
+                else if(r<0.50) { m=2; cR=[15,35]; gC=0.005; lbl="2x"; }
+                else { lbl="1x"; }
+            }
+
+            core.innerText = lbl; core.style.top = Math.random()*80+10+'%'; core.style.left = '-70px'; document.body.appendChild(core);
+            let pos = -70; let ivl = setInterval(()=>{ pos+=2.5; core.style.left=pos+'px'; if(pos>window.innerWidth) {clearInterval(ivl); core.remove();} }, 20);
+            
+            core.onclick = () => {
+                clearInterval(ivl); core.remove(); playSnd('gem');
+                let cWon = 0, gStr = "", mStr = "";
+                if(isEpic) { let sc = Math.floor(Math.random()*3)+1; game.mats.scrap += sc; mStr = ` | +${sc} Scrap`; } 
+                else {
+                    cWon = Math.floor(Math.random()*(cR[1]-cR[0]+1)+cR[0]) * getMult(); game.curr.coins += cWon;
+                    if(Math.random()<gC) { game.curr.gems++; gStr=" | +1 GEM!"; }
+                    let sc=0, d=0, sh=0, v=0;
+                    if(m===1) { sc=4; if(Math.random()<0.1) d=1; }
+                    else if(m===2) { sc=10; d=1; if(Math.random()<0.05) sh=1; }
+                    else if(m===3) { sc=15; d=2; if(Math.random()<0.1) sh=1; }
+                    else if(m===5) { sc=Math.floor(Math.random()*55)+25; d=Math.floor(Math.random()*3)+3; sh=1; if(Math.random()<0.02) v=1; }
+                    else if(m===20) { sc=Math.floor(Math.random()*70)+80; d=Math.floor(Math.random()*11)+5; if(Math.random()<0.2) v=1; game.curr.gems++; gStr=" | +1 GEM!"; }
+                    game.mats.scrap+=sc; game.mats.dust+=d; game.mats.shard+=sh; game.mats.void+=v;
+                    mStr = ` | +${sc} Scrp`; if(d) mStr+=` +${d} Dst`; if(sh) mStr+=` +${sh} Shrd`; if(v) mStr+=` +${v} Void`;
+                }
+                notif(`🔥 Caught ${lbl} ${type} Core! ${cWon?'+'+cWon+' Coins ':''}${gStr}${mStr}`); forceUI();
+            };
+        }
+
+        // --- MINIGAME ---
+        function buildMineGrid() {
+            const mg = document.getElementById('mine-grid'); mg.innerHTML = '';
+            for(let i=0; i<25; i++) {
+                let t = document.createElement('div'); t.className = 'mine-tile';
+                let f = document.createElement('div'); f.className = 'tile-front'; let b = document.createElement('div'); b.className = 'tile-back';
+                t.appendChild(f); t.appendChild(b);
+                t.onclick = () => { if(game.mine.active && game.mine.picks > 0 && !t.classList.contains('flipped')) revealTile(t, b); };
+                mg.appendChild(t);
+            }
+        }
+        function startMine() {
+            if(game.mine.cd > Date.now()) return; if(game.curr.coins < 20) return;
+            game.curr.coins -= 20; game.mine.active = true; game.mine.picks = 5 + (game.equipEq.pick ? 2 : 0); 
+            game.mine.loot = {coin:0, scrap:0, dust:0, shard:0, void:0, gem:0};
+            buildMineGrid(); forceUI();
+        }
+        function revealTile(t, b) {
+            game.mine.picks--; playSnd('mine');
+            let r=Math.random(), c='r-norm', ht='1<br>Coin'; 
+            let lM = 1.0 + (game.mineUpg.loot * 0.2); 
+
+            let addC=Math.floor(2*lM); game.mine.loot.coin += addC; ht=`${addC}<br>Coins`;
+            if(r<0.01) { c='r-leg'; let gC=Math.floor(55*lM); ht=`${gC} Coins<br>1 Void<br>1 Gem`; game.mine.loot.coin+=gC-addC; game.mine.loot.void++; game.mine.loot.gem++; playSnd('gem'); }
+            else if(r<0.06) { c='r-epic'; let eC=Math.floor(18*lM); ht=`${eC} Coins<br>1 Dust<br>1 Shard`; game.mine.loot.coin+=eC-addC; game.mine.loot.dust++; game.mine.loot.shard++; playSnd('coin');}
+            else if(r<0.21) { c='r-rare'; let rC=Math.floor(6*lM); ht=`${rC} Coins<br>1 Scrap`; game.mine.loot.coin+=rC-addC; game.mine.loot.scrap++; }
+            
+            b.classList.add(c); b.innerHTML = ht; t.classList.add('flipped');
+            if(game.mine.picks <= 0) setTimeout(endMine, 800); forceUI();
+        }
+        function endMine() {
+            game.mine.active = false; game.quest.minigame++;
+            let cdMins = 20 - game.mineUpg.cd - (game.skills.s3 ? 5 : 0); game.mine.cd = Date.now() + (cdMins * 60000);
+            
+            game.curr.coins += game.mine.loot.coin; game.curr.gems += game.mine.loot.gem;
+            game.mats.scrap += game.mine.loot.scrap; game.mats.dust += game.mine.loot.dust; 
+            game.mats.shard += game.mine.loot.shard; game.mats.void += game.mine.loot.void;
+
+            let l = game.mine.loot; document.getElementById('mine-loot').innerHTML = `Coins: ${l.coin} <br> Gems: ${l.gem} <br> Scrap: ${l.scrap} | Dust: ${l.dust} <br> Shards: ${l.shard} | Void: ${l.void}`;
+            document.getElementById('mine-summary').style.display = 'flex'; chkQuest(); forceUI();
+        }
+        function closeMineSummary() { document.getElementById('mine-summary').style.display = 'none'; buildMineGrid(); }
+        function buyMineUpg(k) { let u = mineUpgDB[k]; let lvl = game.mineUpg[k]; if(lvl>=u.mx) return; let cCost = Math.floor((u.req.coins||0) * Math.pow(u.m, lvl)); let clCost = Math.floor((u.req.clicks||0) * Math.pow(u.m, lvl)); let sCost = Math.floor((u.req.scrap||0) * Math.pow(u.m, lvl)); let dCost = Math.floor((u.req.dust||0) * Math.pow(u.m, lvl)); if(game.curr.coins>=cCost && game.curr.clicks>=clCost && game.mats.scrap>=sCost && game.mats.dust>=dCost) { game.curr.coins-=cCost; game.curr.clicks-=clCost; game.mats.scrap-=sCost; game.mats.dust-=dCost; game.mineUpg[k]++; forceUI(); } }
+
+        // --- SKILLS & REBIRTH ---
+        function doRebirth() {
+            let r = game.stat.rebirths; if(r>=5) return; let req = rebReq[r];
+            if(game.curr.coins >= req.c && game.mats.void >= req.v && game.upg.auto >= req.a) {
+                if(confirm("Wipe for permanent x"+req.m+" & +"+(r+1)+" Cosmic Point(s)?")) {
+                    game.curr.clicks = 0; game.curr.coins = 0; game.mats.scrap=0; game.mats.dust=0; game.mats.shard=0; game.mats.void-=req.v;
+                    for(let k in game.upg) game.upg[k]=0; game.quest = { time: 0, click: 0, pwr: 0, minigame: 0, mats: 0 };
+                    game.stat.mult = req.m; game.stat.rebirths++; game.curr.cp += (r+1);
+                    notif("🌌 COSMIC REBIRTH SUCCESSFUL 🌌"); forceUI();
+                }
+            }
+        }
+        function upgradeSkill(id) { let skObj = id === 'gd' ? gdLevels : tsLevels; let curLvl = game.skills[id]; if(curLvl >= 6) return; let reqCP = skObj[curLvl+1].cst; if(game.curr.cp >= reqCP) { game.curr.cp -= reqCP; game.skills[id]++; forceUI(); } }
+        function buySkill(id) { let c = id; if(!game.skills['s'+id] && game.curr.cp >= c) { game.curr.cp -= c; game.skills['s'+id] = true; forceUI(); } }
+
+        function actGD() {
+            let lvl = game.skills.gd; if(lvl === 0) return; let cfg = gdLevels[lvl];
+            if(game.timers.gd > Date.now()) return;
+            game.timers.gd = Date.now() + (cfg.cd * 1000); game.activeAbils.gdEnd = Date.now() + (cfg.dur * 1000);
+            document.body.classList.add('golden-dice-active'); playSnd('magic'); notif("🎲 GOLDEN DICE ACTIVE! Massive Buffs! 🎲"); forceUI();
+        }
+
+        function actTS() {
+            let lvl = game.skills.ts; if(lvl === 0) return; let cfg = tsLevels[lvl];
+            if(game.timers.ts > Date.now()) return;
+            game.timers.ts = Date.now() + (cfg.cd * 1000);
+            let f = document.getElementById('timeskip-flash'); f.style.opacity = '1'; setTimeout(()=>f.style.opacity = '0', 500); playSnd('magic');
+            let tSec = cfg.sMins * 60; let tClk = cfg.cps * tSec * getPwr(); let eC = cfg.cps * tSec * getCoinC() * getMult(); let eG = cfg.cps * tSec * getGemC();
+            game.curr.clicks += tClk; game.stat.tClicks += tClk; game.curr.coins += eC; game.curr.gems += Math.floor(eG) + (Math.random() < (eG%1) ? 1 : 0);
+            notif(`⏳ TIMESKIP! Skipped ${cfg.sMins} mins. Gained ${fNum(tClk)} Clicks, ${fNum(eC)} Coins!`); forceUI();
+        }
+
+        // --- CRAFTING & PET FUSION & FORGE ---
+        function sTab(id) { document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active'); event.target.classList.add('active'); }
+        
+        function startCraft(t) {
+            if(game.craft.active) return; let cReq = craftDB[t];
+            if(game.curr.clicks>=cReq.c && game.mats.scrap>=cReq.s && game.mats.dust>=cReq.d && game.mats.shard>=cReq.sh && game.mats.void>=cReq.v) {
+                game.curr.clicks-=cReq.c; game.mats.scrap-=cReq.s; game.mats.dust-=cReq.d; game.mats.shard-=cReq.sh; game.mats.void-=cReq.v;
+                let tm = cReq.t * (game.shop.arts.time ? 0.8 : 1);
+                game.craft.active=true; game.craft.type=t; game.craft.start=Date.now(); game.craft.end=Date.now()+(tm*60000); forceUI();
+            }
+        }
+        function skipCraft() { let mL = Math.max(1, Math.ceil((game.craft.end - Date.now())/60000)); if(game.curr.coins>=mL) { game.curr.coins-=mL; game.craft.end=Date.now(); forceUI(); } }
+        function fCraft() { game.craft.active=false; game.pets.eggs.push(game.craft.type); notif(`🥚 ${game.craft.type} Egg Crafted! Check Inventory.`); forceUI(); }
+        
+        const petNames = { 'Common': ["Dirt Slime", "Rusty Bot", "Flea"], 'Uncommon': ["Copper Hound", "Glass Wisp", "Sprite"], 'Rare': ["Silver Knight", "Aqua Spirit", "Gem Beetle"], 'Epic': ["Void Walker", "Plasma Dragon", "Star Weaver"], 'Legendary': ["Cosmic Titan", "Infinity Phoenix", "God Slime"] };
+        function openEgg(idx) {
+            let type = game.pets.eggs[idx]; game.pets.eggs.splice(idx, 1); playSnd('magic');
+            let n = petNames[type][Math.floor(Math.random()*petNames[type].length)];
+            let p={ id:Date.now(), n:n, r:type, s:0, p:type==='Common'?3:type==='Uncommon'?10:type==='Rare'?35:type==='Epic'?150:1000, c:type==='Common'?1:type==='Uncommon'?2:type==='Rare'?5:type==='Epic'?15:50 };
+            game.pets.inv.push(p); notif(`✨ Opened ${type} Egg! Got ${n}!`); forceUI();
+        }
+        function eqPet(id) { let p=game.pets.inv.find(x=>x.id===id); if(p){ game.pets.eq=(game.pets.eq&&game.pets.eq.id===id)?null:p; forceUI(); } }
+
+        function autoFusePets() {
+            let fused = false;
+            let counts = {};
+            // Group by Name + Rarity + Stars
+            game.pets.inv.forEach(p => { let k = `${p.n}_${p.r}_${p.s}`; if(!counts[k]) counts[k] = []; counts[k].push(p); });
+            
+            for(let k in counts) {
+                let group = counts[k];
+                while(group.length >= 3) {
+                    fused = true;
+                    let toFuse = group.splice(0, 3);
+                    // Remove from actual inventory
+                    toFuse.forEach(tp => { let idx = game.pets.inv.findIndex(x=>x.id===tp.id); if(idx>-1) game.pets.inv.splice(idx, 1); });
+                    // Create upgraded pet
+                    let base = toFuse[0];
+                    let np = { id:Date.now()+Math.random(), n:base.n, r:base.r, s:base.s+1, p:base.p*2, c:base.c*2 };
+                    game.pets.inv.push(np);
+                    if(game.pets.eq && toFuse.find(x=>x.id===game.pets.eq.id)) game.pets.eq = np; // Auto re-equip if fused
+                }
+            }
+            if(fused) { notif("✨ Pets Fused Successfully! ✨"); playSnd('magic'); forceUI(); }
+            else { alert("You don't have 3 identical pets to fuse!"); }
+        }
+
+        function forgeDarkMatter() { if(game.mats.scrap >= 10000) { game.mats.scrap -= 10000; game.curr.dm++; notif("🔥 Forged 1 Dark Matter! 🔥"); forceUI(); } }
+        function buyDMUpg(k) { if(k==='combo' && game.forgeUpg.combo<5 && game.curr.dm>=1) { game.curr.dm-=1; game.forgeUpg.combo++; forceUI(); } }
+        function craftEquip(k) {
+            if(k==='pick' && !game.equipInv.pick && game.mats.void>=5 && game.curr.clicks>=50000) { game.mats.void-=5; game.curr.clicks-=50000; game.equipInv.pick=true; }
+            if(k==='aura' && !game.equipInv.aura && game.mats.shard>=100 && game.curr.coins>=10000) { game.mats.shard-=100; game.curr.coins-=10000; game.equipInv.aura=true; }
+            forceUI();
+        }
+        function toggleEquip(k) { if(game.equipInv[k]) { game.equipEq[k] = !game.equipEq[k]; forceUI(); } }
+
+        // --- SHOPS & TRADES ---
+        function buyUpg(k) { let u=upgDB[k]; let c = u.cArr ? u.cArr[game.upg[k]] : Math.floor(u.c*Math.pow(u.m,game.upg[k])); if(game.curr[u.cType] >= c){ game.curr[u.cType]-=c; game.upg[k]++; forceUI(); } }
+        function buyShopItem(i) { if(i==='auto' && !game.shop.auto && game.curr.coins>=75) { game.curr.coins-=75; game.shop.auto=true; game.upg.auto=1; } if(i==='gold' && !game.shop.goldAuto && game.curr.gems>=1) { game.curr.gems-=1; game.shop.goldAuto=true; } forceUI(); }
+        function buyArt(id) { let c=id==='time'?2:5; if(!game.shop.arts[id] && game.curr.gems>=c) {game.curr.gems-=c; game.shop.arts[id]=true; forceUI();} }
+        function buyTheme(id) { let t=themeDB[id]; if(!game.shop.themes.includes(id) && game.curr[t.cType]>=t.c && (!t.reqMat || game.mats[t.reqMat]>=t.mCost)) { game.curr[t.cType]-=t.c; if(t.reqMat) game.mats[t.reqMat] -= t.mCost; game.shop.themes.push(id); forceUI(); } }
+        function eqTheme(id) { if(game.shop.themes.includes(id)) { game.shop.eqTheme=id; document.body.className=`theme-${id}`; forceUI(); } }
+        
+        function tradeBM(type) {
+            if(type==='dust' && game.mats.scrap>=500) { game.mats.scrap-=500; game.mats.dust+=5; }
+            if(type==='void' && game.mats.dust>=100) { game.mats.dust-=100; game.mats.void+=1; }
+            if(type==='gem' && game.curr.coins>=250000) { game.curr.coins-=250000; game.curr.gems+=1; }
+            forceUI();
+        }
+
+        function chkQuest() { for(let k in questDB) { let q=questDB[k]; let t=game.quest[k]||0; if(t<q.t.length && q.c()>=q.t[t]) { game.curr.coins+=q.r[t]; game.quest[k]++; forceUI(); } } }
+
+        // --- RENDER ENGINE ---
+        function forceUI() {
+            document.getElementById('v-click').innerText=fNum(game.curr.clicks); document.getElementById('v-coin').innerText=fNum(game.curr.coins); document.getElementById('v-gem').innerText=fNum(game.curr.gems); document.getElementById('v-rebirth').innerText=game.stat.rebirths+'/5';
+            document.getElementById('v-pwr').innerText=fNum(getPwr()); document.getElementById('v-mult').innerText='x'+getMult(); document.getElementById('v-chance').innerText=(getCoinC()*100).toFixed(1)+'%'; 
+            document.getElementById('v-gemc').innerText=(getGemC()*100).toFixed(6)+'%'; document.getElementById('v-matc').innerText=(getMatC()*100).toFixed(1)+'%';
+            let spd = game.upg.auto * getMult(); if(game.shop.goldAuto) spd *= 2; document.getElementById('v-cps').innerText=spd;
+            document.getElementById('v-pet').innerHTML=game.pets.eq ? `${game.pets.eq.n} ${"⭐".repeat(game.pets.eq.s)} <br> (+${game.pets.eq.p} Pwr, +${game.pets.eq.c}%)` : 'None';
+            
+            let eqA = []; if(game.equipEq.pick) eqA.push("Void Pickaxe"); if(game.equipEq.aura) eqA.push("Magnetic Aura");
+            document.getElementById('v-equip').innerText = eqA.length > 0 ? eqA.join(', ') : "None";
+            document.getElementById('v-max-combo').innerText = 500 + (game.forgeUpg.combo*100);
+
+            // Abil Tracker
+            let abHTML = "";
+            if(game.skills.gd > 0) {
+                if(isGD()) abHTML += `<div style="color: #fde047; font-weight: bold; margin-bottom: 5px;">Dice Active: ${Math.ceil((game.activeAbils.gdEnd - Date.now())/1000)}s</div>`;
+                else if(game.timers.gd > Date.now()) abHTML += `<div style="color: #ef4444; margin-bottom: 5px;">Dice CD: ${Math.ceil((game.timers.gd - Date.now())/1000)}s</div>`;
+                else abHTML += `<button class="btn-act" onclick="actGD()" style="background: #fde047; margin: 0 0 5px 0;">Roll Golden Dice</button>`;
+            }
+            if(game.skills.ts > 0) {
+                if(game.timers.ts > Date.now()) abHTML += `<div style="color: #ef4444; margin-bottom: 5px;">Timeskip CD: ${Math.ceil((game.timers.ts - Date.now())/1000)}s</div>`;
+                else abHTML += `<button class="btn-act" onclick="actTS()" style="background: #e9d5ff; margin: 0 0 5px 0;">Use Timeskip</button>`;
+            }
+            document.getElementById('v-abilities').innerHTML = abHTML || "None Unlocked.";
+
+            // Inventory
+            document.getElementById('i-scrap').innerText=fNum(game.mats.scrap); document.getElementById('i-dust').innerText=fNum(game.mats.dust); document.getElementById('i-shard').innerText=fNum(game.mats.shard); document.getElementById('i-void').innerText=fNum(game.mats.void); document.getElementById('i-dm').innerText=game.curr.dm;
+            let ec=document.getElementById('c-eggs'); ec.innerHTML='';
+            game.pets.eggs.forEach((e,i) => { ec.innerHTML+=`<div class="card" style="display:inline-block; width: 45%; margin-right: 2%; cursor:pointer;" onclick="openEgg(${i})"><h4 style="justify-content:center;">🥚 ${e}</h4><p style="text-align:center;">Click to Open</p></div>`; });
+            if(game.pets.eggs.length===0) ec.innerHTML='<p style="font-size:11px; color:#aaa;">No eggs. Craft some!</p>';
+
+            let pc=document.getElementById('c-pets'); pc.innerHTML='';
+            game.pets.inv.forEach(p=>{ let ie=game.pets.eq&&game.pets.eq.id===p.id; pc.innerHTML+=`<div class="card" style="${ie?'background:rgba(255,255,255,0.1)':''}"><h4>${p.n} ${"⭐".repeat(p.s)} <span class="badge">${p.r}</span></h4><p>+${p.p} Pwr | +${p.c}% Coin</p><button class="btn-act" style="background:${ie?'#64748b':'var(--click-color)'}" onclick="eqPet(${p.id})">${ie?'Unequip':'Equip'}</button></div>`; });
+            
+            let eic=document.getElementById('c-equip-inv'); eic.innerHTML='';
+            if(game.equipInv.pick) { let ie = game.equipEq.pick; eic.innerHTML+=`<div class="card"><h4>⛏️ Void Pickaxe</h4><p>+2 Minigame Picks</p><button class="btn-act" onclick="toggleEquip('pick')" style="background:${ie?'#64748b':'var(--click-color)'}">${ie?'Unequip':'Equip'}</button></div>`; }
+            if(game.equipInv.aura) { let ie = game.equipEq.aura; eic.innerHTML+=`<div class="card"><h4>🔮 Magnetic Aura</h4><p>-30s Core Spawn CD</p><button class="btn-act" onclick="toggleEquip('aura')" style="background:${ie?'#64748b':'var(--click-color)'}">${ie?'Unequip':'Equip'}</button></div>`; }
+
+            let ic=document.getElementById('c-inv-themes'); ic.innerHTML='';
+            game.shop.themes.forEach(k=>{ let t=themeDB[k]; let eq=game.shop.eqTheme===k; ic.innerHTML+=`<div class="card" style="${t.css}"><h4>${t.n}</h4><p>Buff: ${t.b}</p><button class="btn-act" onclick="eqTheme('${k}')" ${eq?'disabled':''}>${eq?'Equipped':'Equip'}</button></div>`; });
+
+            // Upgrades
+            let uc=document.getElementById('c-upg'); 
+            let cats = {}; for(let k in upgDB) { if(k==='auto' && !game.shop.auto) continue; let c = upgDB[k].cat; if(!cats[c]) cats[c]=[]; cats[c].push(k); }
+            let uHTML = "";
+            for(let c in cats) {
+                uHTML += `<div class="cat-header">${c}</div>`;
+                cats[c].forEach(k => {
+                    let u=upgDB[k]; let lvl=game.upg[k]; let cost = u.cArr ? u.cArr[lvl] : Math.floor(u.c*Math.pow(u.m,lvl)); let mx=lvl>=u.mx; let cStr = u.cType==='clicks'?'var(--click-color)':'var(--coin-color)';
+                    let canAfford = game.curr[u.cType] >= cost;
+                    uHTML+=`<div class="card" style="border-left-color:${cStr}"><h4>${u.n} <span class="badge">Lvl ${lvl}/${u.mx}</span></h4><p>${u.d}</p><button class="btn-act" onclick="buyUpg('${k}')" ${mx||!canAfford?'disabled':''}>${mx?'MAX':fNum(cost)+' '+u.cType.charAt(0).toUpperCase()+u.cType.slice(1)}</button></div>`; 
+                });
+            }
+            if(uc.innerHTML !== uHTML) uc.innerHTML = uHTML;
+
+            // Crafting & Forge
+            if(game.craft.active) { 
+                document.getElementById('active-craft').style.display='block'; document.getElementById('craft-opts').style.display='none'; 
+                let totalT = game.craft.end - game.craft.start; let elap = Date.now() - game.craft.start; let pct = Math.min((elap/totalT)*100, 100);
+                document.getElementById('craft-bar').style.width = pct + '%';
+                let msL = Math.max(1,Math.ceil((game.craft.end-Date.now())/60000));
+                document.getElementById('craft-time').innerText = msL + " min";
+                document.getElementById('btn-skip').innerText=`Skip for ${msL} Coins`; document.getElementById('btn-skip').disabled = game.curr.coins < msL;
+            } else { document.getElementById('active-craft').style.display='none'; document.getElementById('craft-opts').style.display='block'; }
+            
+            ['Common','Uncommon','Rare','Epic','Legendary'].forEach(t => {
+                let r = craftDB[t]; let btn = document.getElementById('btn-cr-'+t.substring(0,3).toLowerCase());
+                if(btn) btn.disabled = !(game.curr.clicks>=r.c && game.mats.scrap>=r.s && game.mats.dust>=r.d && game.mats.shard>=r.sh && game.mats.void>=r.v);
+            });
+
+            document.getElementById('dm-upg-combo').innerText = `Lvl ${game.forgeUpg.combo}/5`; document.getElementById('btn-dm-combo').disabled = game.forgeUpg.combo >= 5 || game.curr.dm < 1; document.getElementById('btn-dm-combo').innerText = game.forgeUpg.combo >= 5 ? "MAX" : "Cost: 1 DM";
+            document.getElementById('btn-eq-pick').innerText = game.equipInv.pick ? "Crafted" : "Craft (5 Void, 50k Clicks)"; document.getElementById('btn-eq-pick').disabled = game.equipInv.pick || game.mats.void<5 || game.curr.clicks<50000;
+            document.getElementById('btn-eq-aura').innerText = game.equipInv.aura ? "Crafted" : "Craft (100 Shards, 10k Coins)"; document.getElementById('btn-eq-aura').disabled = game.equipInv.aura || game.mats.shard<100 || game.curr.coins<10000;
+
+            // Shop
+            let bAu=document.getElementById('b-shop-auto'); bAu.innerText=game.shop.auto?"Owned":"Buy: 75 Coins"; bAu.disabled=game.shop.auto||game.curr.coins<75;
+            let bGA=document.getElementById('b-shop-gold'); bGA.innerText=game.shop.goldAuto?"Owned":"Buy: 1 Gem"; bGA.disabled=game.shop.goldAuto||game.curr.gems<1;
+            let bAT=document.getElementById('b-art-time'); bAT.innerText=game.shop.arts.time?"Owned":"Buy: 2 Gems"; bAT.disabled=game.shop.arts.time||game.curr.gems<2;
+            let bAM=document.getElementById('b-art-mag'); bAM.innerText=game.shop.arts.magnet?"Owned":"Buy: 5 Gems"; bAM.disabled=game.shop.arts.magnet||game.curr.gems<5;
+            
+            let tc=document.getElementById('c-themes'); tc.innerHTML='';
+            for(let k in themeDB) { 
+                let t=themeDB[k]; if(game.shop.themes.includes(k)) continue; 
+                let reqStr = t.reqMat ? `+ ${t.mCost} ${t.reqMat}` : '';
+                let canAfford = game.curr[t.cType]>=t.c && (!t.reqMat || game.mats[t.reqMat]>=t.mCost);
+                tc.innerHTML+=`<div class="card" style="${t.css}"><h4>${t.n}</h4><p>Cost: ${t.c} ${t.cType} ${reqStr}</p><p>Buff: ${t.b}</p><button class="btn-act" ${!canAfford?'disabled':''} onclick="buyTheme('${k}')">Craft Blueprint</button></div>`; 
+            }
+
+            // Quests
+            let qc=document.getElementById('c-quest'); 
+            let qCats = {}; for(let k in questDB) { let c = questDB[k].cat; if(!qCats[c]) qCats[c]=[]; qCats[c].push(k); }
+            let qHTML = "";
+            for(let c in qCats) {
+                qHTML += `<div class="cat-header">${c}</div>`;
+                qCats[c].forEach(k => {
+                    let q=questDB[k]; let t=game.quest[k]||0; let mx=t>=q.t.length; let g=mx?q.t[t-1]:q.t[t]; let p=q.c(); let pc=Math.min(p/g*100, 100); 
+                    qHTML+=`<div class="card"><h4>${q.n} <span class="badge">${mx?'MAX':`T${t+1}`}</span></h4><p>${q.d}</p><p style="font-size:10px">Reward: ${mx?'Claimed':q.r[t]+' Coins'}</p><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${pc}%"></div></div><p style="text-align:right; margin:2px 0 0; font-size:10px">${Math.floor(p)}/${g}</p></div>`; 
+                });
+            }
+            if(qc.innerHTML !== qHTML) qc.innerHTML = qHTML;
+
+            // Mining
+            let muHTML = "";
+            for(let k in mineUpgDB) {
+                let u=mineUpgDB[k]; let lvl=game.mineUpg[k]; let mx=lvl>=u.mx;
+                let cCost = Math.floor((u.req.coins||0) * Math.pow(u.m, lvl)); let clCost = Math.floor((u.req.clicks||0) * Math.pow(u.m, lvl)); let sCost = Math.floor((u.req.scrap||0) * Math.pow(u.m, lvl)); let dCost = Math.floor((u.req.dust||0) * Math.pow(u.m, lvl));
+                let cStr = []; if(cCost) cStr.push(fNum(cCost)+" Coins"); if(clCost) cStr.push(fNum(clCost)+" Clicks"); if(sCost) cStr.push(sCost+" Scrap"); if(dCost) cStr.push(dCost+" Dust");
+                let canAfford = game.curr.coins>=cCost && game.curr.clicks>=clCost && game.mats.scrap>=sCost && game.mats.dust>=dCost;
+                muHTML += `<div class="card"><h4>${u.n} <span class="badge">Lvl ${lvl}/${u.mx}</span></h4><p>${u.d}</p><p style="font-size:10px;">Cost: ${cStr.join(', ')}</p><button class="btn-act" onclick="buyMineUpg('${k}')" ${mx||!canAfford?'disabled':''}>${mx?'MAX':'Upgrade'}</button></div>`;
+            }
+            document.getElementById('c-mine-upg').innerHTML = muHTML;
+
+            let mBtn=document.getElementById('btn-start-mine'); let mStat=document.getElementById('mine-status');
+            if(game.mine.active) { mBtn.disabled=true; mStat.innerText='Mining...'; mStat.style.color='#fef08a'; }
+            else if(game.mine.cd>Date.now()) { mBtn.disabled=true; let ms=Math.ceil((game.mine.cd-Date.now())/1000); mStat.innerText=`CD: ${Math.floor(ms/60)}m ${ms%60}s`; mStat.style.color='#ef4444'; }
+            else { mBtn.disabled=(game.curr.coins<20); mBtn.innerText="Play (20 Coins)"; mStat.innerText='Ready!'; mStat.style.color='#4ade80'; }
+            document.getElementById('mine-picks').innerText=game.mine.picks;
+
+            // Rebirth
+            document.getElementById('v-cp').innerText=game.curr.cp; document.getElementById('reb-lvl').innerText=game.stat.rebirths+'/5';
+            if(game.stat.rebirths<5) { 
+                let r=rebReq[game.stat.rebirths]; document.getElementById('req-txt').innerHTML=`${fNum(r.c)} Coins <br> ${r.v} Void Matter <br> Autoclicker Lvl ${r.a}`; 
+                document.getElementById('btn-reb').innerText=`Rebirth for x${r.m} & +${game.stat.rebirths+1} CP`; 
+                document.getElementById('btn-reb').disabled=(game.curr.coins<r.c || game.mats.void<r.v || game.upg.auto<r.a); 
+            } else { document.getElementById('req-txt').innerText="MAX"; document.getElementById('btn-reb').innerText="MAXED"; document.getElementById('btn-reb').disabled=true; }
+            
+            let skG = game.skills.gd; let cfgG = gdLevels[skG+1]; 
+            document.getElementById('sk-gd-lvl').innerText = `Lvl ${skG}/6`;
+            if(skG>0) document.getElementById('sk-gd-desc').innerText = `Every ${gdLevels[skG].cd/60}m, Dice turns Gold for ${gdLevels[skG].dur}s. (${gdLevels[skG].cM}x Pwr, ${gdLevels[skG].cnM}x Coin, ${gdLevels[skG].gM}x Gem, ${gdLevels[skG].mM}x Mat)`;
+            let bG = document.getElementById('btn-sk-gd'); if(skG>=6) { bG.innerText="MAXED"; bG.disabled=true; } else { bG.innerText=`Upgrade (${cfgG.cst} CP)`; bG.disabled = game.curr.cp < cfgG.cst; }
+
+            let skT = game.skills.ts; let cfgT = tsLevels[skT+1]; 
+            document.getElementById('sk-ts-lvl').innerText = `Lvl ${skT}/6`;
+            if(skT>0) document.getElementById('sk-ts-desc').innerText = `Every ${tsLevels[skT].cd/60}m, Skip ${tsLevels[skT].sMins} mins worth of production at ${tsLevels[skT].cps} CPS.`;
+            let bT = document.getElementById('btn-sk-ts'); if(skT>=6) { bT.innerText="MAXED"; bT.disabled=true; } else { bT.innerText=`Upgrade (${cfgT.cst} CP)`; bT.disabled = game.curr.cp < cfgT.cst; }
+            
+            [1,2,3].forEach(i=>{ let nd=document.getElementById('sk-'+i); if(game.skills['s'+i]) nd.classList.add('unlocked'); else nd.classList.remove('unlocked'); });
+        }
+
+        // --- LOOP & INIT ---
+        loadGame(); buildMineGrid(); forceUI();
+
+        setInterval(() => {
+            game.stat.playtime++;
+            
+            // Corruption Event Check (Every 5 mins roughly)
+            if(!game.corrupt.active && Date.now() > game.corrupt.cd) {
+                if(Math.random() < 0.2) triggerCorruption(); // 20% chance to trigger once CD is up
+                else game.corrupt.cd = Date.now() + 60000; // Check again in 1 min
+            }
+
+            // Passive Logic (Halted during corruption)
+            if(!game.corrupt.active) {
+                let cpm = game.upg.pass * getMult(); if(cpm>0) game.curr.coins += (cpm/60);
+                
+                let spd = game.upg.auto * getMult(); if(game.shop.goldAuto) spd *= 2;
+                if(spd>0) { 
+                    for(let i=0;i<spd;i++) trgClick(null,null,false); 
+                    let scn = document.getElementById('main-scene'); scn.style.transform = 'scale(0.96)'; setTimeout(() => scn.style.transform = 'scale(1)', 100);
+                }
+            } else {
+                // Corruption Drain
+                let drain = Math.max(1, Math.floor(game.curr.coins * 0.01));
+                game.curr.coins -= drain; if(game.curr.coins < 0) game.curr.coins = 0;
+                document.getElementById('crpt-time').innerText = Math.max(0, Math.ceil((game.corrupt.end - Date.now())/1000));
+                if(Date.now() > game.corrupt.end) {
+                    game.corrupt.active = false; game.corrupt.cd = Date.now() + 300000; // 5 min CD
+                    document.getElementById('main-scene').classList.remove('corrupted'); document.getElementById('corrupt-ui').style.display = 'none';
+                    notif("💀 Core Purge FAILED. The Core stole your coins!"); playSnd('boss');
+                }
+            }
+
+            // Combo Decay
+            if(Date.now() - lastManClick > 1500 && combo > 0) { 
+                combo -= Math.max(1, Math.floor(combo / 10)); // Smooth drain
+                if(combo < 0) combo = 0;
+                let mxC = 500 + (game.forgeUpg.combo*100);
+                document.getElementById('combo-fill').style.width = (combo/mxC)*100 + '%';
+                let txt = document.getElementById('combo-txt');
+                txt.innerText = combo > 4 ? `${combo}x Combo! [x${(1.0 + combo*0.01).toFixed(2)}]` : '';
+            }
+            
+            if(game.craft.active && Date.now()>=game.craft.end) fCraft();
+            
+            // Core Spawns
+            let spT = game.shop.arts.magnet ? 60 : 120;
+            if(game.equipEq.aura) spT -= 30; // Aura buff
+            
+            let timeSinceDrop = (Date.now() - game.timers.lastGcDrop) / 1000;
+            
+            game.timers.gc++; 
+            if(game.timers.gc >= spT) { 
+                if(Math.random()<0.8 || timeSinceDrop > 300) trgCore(); // Spawns, guaranteed if pity timer > 5m
+                game.timers.gc=0; 
+            }
+
+            if(document.body.classList.contains('golden-dice-active') && !isGD()) document.body.classList.remove('golden-dice-active');
+
+            forceUI();
+            if(game.stat.playtime % 5 === 0) saveGame(); 
+
+        }, 1000);
+    </script>
+</body>
+</html>
