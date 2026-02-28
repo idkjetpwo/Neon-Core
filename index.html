@@ -3,26 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Miner V8: The Apex (Updated)</title>
+    <title>Cosmic Miner V8: The Apex</title>
     <style>
         /* =========================================
            THEME VARIABLES & DEFAULTS
         ========================================= */
         :root { 
-            --bg-grad-1: #0f172a; 
-            --bg-grad-2: #1e293b; 
-            --bg-grad-3: #0f2027; 
+            --bg-grad-1: #0f172a; --bg-grad-2: #1e293b; --bg-grad-3: #0f2027; 
             --panel-bg: rgba(15, 23, 42, 0.85); 
-            --text-main: #f8fafc; 
-            --text-muted: #94a3b8;
-            --click-color: #38bdf8; 
-            --coin-color: #fbbf24; 
-            --gem-color: #e879f9; 
-            --mat-color: #a78bfa; 
-            --dm-color: #ef4444;
-            --galac-color: #d946ef;
-            --radius-md: 12px; 
-            --radius-sm: 8px;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+            --click-color: #38bdf8; --coin-color: #fbbf24; --gem-color: #e879f9; 
+            --mat-color: #a78bfa; --dm-color: #ef4444; --galac-color: #d946ef;
+            --radius-md: 12px; --radius-sm: 8px;
         }
 
         /* Deep Themes Overrides */
@@ -30,66 +22,62 @@
         body.theme-water { --bg-grad-1: #0c4a6e; --bg-grad-2: #0369a1; --bg-grad-3: #082f49; --click-color: #38bdf8; --panel-bg: rgba(12, 74, 110, 0.85); --mat-color: #7dd3fc; }
         body.theme-glitter { --bg-grad-1: #4a044e; --bg-grad-2: #701a75; --bg-grad-3: #2e1065; --click-color: #f472b6; --panel-bg: rgba(74, 4, 78, 0.85); --mat-color: #fbcfe8; }
         body.theme-gold { --bg-grad-1: #452e04; --bg-grad-2: #785209; --bg-grad-3: #332001; --click-color: #fde047; --panel-bg: rgba(69, 46, 4, 0.85); --text-main: #fef08a; --mat-color: #fcd34d; }
-        body.theme-void { --bg-grad-1: #000000; --bg-grad-2: #111111; --bg-grad-3: #220022; --click-color: #c084fc; --panel-bg: rgba(0, 0, 0, 0.9); --text-main: #e9d5ff; --mat-color: #d8b4fe; }
+        body.theme-void { --bg-grad-1: #000000; --bg-grad-2: #0a0a0a; --bg-grad-3: #111111; --click-color: #c084fc; --panel-bg: rgba(0, 0, 0, 0.9); --text-main: #e9d5ff; --mat-color: #d8b4fe; }
         body.theme-galactic { --bg-grad-1: #2e0b57; --bg-grad-2: #4a044e; --bg-grad-3: #0f172a; --click-color: #d946ef; --panel-bg: rgba(46, 11, 87, 0.9); --text-main: #f5d0fe; --mat-color: #e879f9; }
+        body.theme-inferno { --bg-grad-1: #450a0a; --bg-grad-2: #7f1d1d; --bg-grad-3: #000000; --click-color: #ef4444; --panel-bg: rgba(69, 10, 10, 0.9); --text-main: #fca5a5; --mat-color: #f87171; }
+        body.theme-cyber { --bg-grad-1: #020617; --bg-grad-2: #082f49; --bg-grad-3: #022c22; --click-color: #22d3ee; --panel-bg: rgba(2, 6, 23, 0.9); --text-main: #e0f2fe; --mat-color: #fde047; --coin-color: #fde047; }
+        body.theme-matrix { --bg-grad-1: #064e3b; --bg-grad-2: #022c22; --bg-grad-3: #000000; --click-color: #4ade80; --panel-bg: rgba(2, 44, 34, 0.9); --text-main: #4ade80; --mat-color: #22c55e; }
+        body.theme-plasma { --bg-grad-1: #1e1b4b; --bg-grad-2: #312e81; --bg-grad-3: #0f172a; --click-color: #818cf8; --panel-bg: rgba(30, 27, 75, 0.9); --text-main: #c7d2fe; --mat-color: #6366f1; }
 
-        /* Galactic Event Active */
-        body.galactic-active {
-            animation: galacticPulse 2s infinite alternate !important;
-            --click-color: #d946ef !important;
+        /* =========================================
+           BETA UI - COMPLETE OVERHAUL & GLOW
+        ========================================= */
+        body.beta-ui { 
+            flex-direction: row; font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--bg-grad-2), var(--bg-grad-1), var(--bg-grad-3)) !important;
+            background-size: 200% 200%; animation: gradBG 20s ease infinite;
         }
-        @keyframes galacticPulse {
-            0% { box-shadow: inset 0 0 50px rgba(217, 70, 239, 0.2); }
-            100% { box-shadow: inset 0 0 200px rgba(217, 70, 239, 0.6); }
+        body.beta-ui .panel { 
+            background: rgba(10, 15, 30, 0.5) !important; 
+            backdrop-filter: blur(25px) saturate(180%); 
+            border: 1px solid rgba(255,255,255,0.15); 
+            border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); 
+            margin: 15px; 
         }
-
-        /* Beta UI Layout - HUGE CHANGE */
-        body.beta-ui { flex-direction: row; }
-        body.beta-ui #right-panel { order: 1; flex: 1; border-left: none; border-right: 2px solid var(--click-color); padding: 0; display: flex; flex-direction: row; }
-        body.beta-ui #right-panel .tabs { flex-direction: column; width: 110px; padding: 10px 0; background: rgba(0,0,0,0.4); border-right: 1px solid rgba(255,255,255,0.1); margin-bottom: 0; gap: 5px; overflow-y: auto;}
-        body.beta-ui #right-panel .tab-btn { text-align: left; padding: 12px 10px; border-radius: 0; border-bottom: none; border-left: 3px solid transparent; background: transparent; font-size: 12px;}
-        body.beta-ui #right-panel .tab-btn.active { border-left-color: var(--click-color); background: rgba(255, 255, 255, 0.1); }
-        body.beta-ui #right-panel .tab-content { padding: 20px; flex: 1; overflow-y: auto; }
-        body.beta-ui #center-panel { order: 2; width: 380px; flex-grow: 0; border-right: 2px solid var(--click-color); }
-        body.beta-ui #left-panel { order: 3; width: 300px; border-right: none; border-left: none; }
-
-        /* Active Ability Glows */
-        body.golden-dice-active { animation: diceGlow 2s infinite alternate; }
-        @keyframes diceGlow { 0% { box-shadow: inset 0 0 50px rgba(250, 204, 21, 0.2); } 100% { box-shadow: inset 0 0 150px rgba(250, 204, 21, 0.6); } }
-
-        #timeskip-flash { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+        body.beta-ui #left-panel { width: 320px; padding: 25px; border-right: none; }
+        body.beta-ui #center-panel { order: 2; flex-grow: 1; border: none; background: radial-gradient(circle, rgba(255,255,255, 0.03) 0%, transparent 70%); margin: 15px 0;}
+        body.beta-ui #right-panel { order: 3; width: 650px; padding: 0; display: flex; flex-direction: row; overflow: hidden;}
+        body.beta-ui .tabs { flex-direction: column; width: 120px; background: rgba(0,0,0,0.3); border-right: 1px solid rgba(255,255,255,0.05); margin: 0; padding: 15px 0; overflow-y: auto;}
+        body.beta-ui .tab-btn { text-align: left; padding: 15px 12px; border-radius: 0; border-bottom: none; border-left: 4px solid transparent; background: transparent; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; transition: 0.3s;}
+        body.beta-ui .tab-btn:hover { background: rgba(255,255,255,0.08); padding-left: 18px;}
+        body.beta-ui .tab-btn.active { border-left-color: var(--click-color); background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 100%); color: var(--click-color); padding-left: 18px;}
+        body.beta-ui .tab-content { padding: 25px; flex: 1; overflow-y: auto; }
+        body.beta-ui .btn-act { border-radius: 30px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); padding: 10px; transition: all 0.3s;}
+        body.beta-ui .btn-act:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.6); filter: brightness(1.3); }
+        body.beta-ui .card { border-radius: 18px; background: rgba(0,0,0,0.35); border-left-width: 6px; box-shadow: 0 6px 12px rgba(0,0,0,0.3); padding: 15px;}
+        body.beta-ui .stat-box { border-radius: 18px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 10px rgba(0,0,0,0.5);}
 
         /* Main Body Settings */
-        body { 
-            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; 
-            background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2), var(--bg-grad-3)); 
-            background-size: 400% 400%; animation: gradBG 15s ease infinite; 
-            color: var(--text-main); display: flex; height: 100vh; overflow: hidden; user-select: none;
-        }
+        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2), var(--bg-grad-3)); background-size: 400% 400%; animation: gradBG 15s ease infinite; color: var(--text-main); display: flex; height: 100vh; overflow: hidden; user-select: none; }
         @keyframes gradBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         /* =========================================
            LAYOUT PANELS & RESPONSIVENESS
         ========================================= */
-        .panel { 
-            background: var(--panel-bg); backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); transition: background 0.5s; 
-            display: flex; flex-direction: column; 
-        }
+        .panel { background: var(--panel-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); transition: background 0.5s; display: flex; flex-direction: column; }
         #left-panel { width: 320px; padding: 20px; border-right: 2px solid var(--click-color); overflow-y: auto; z-index: 10; flex-shrink: 0; }
         #center-panel { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; min-height: 350px; }
         #right-panel { width: 520px; padding: 20px; border-left: 2px solid var(--click-color); z-index: 10; flex-shrink: 0; }
 
         @media (max-width: 950px) {
-            body { flex-direction: column !important; overflow-y: auto; height: auto; display: block; }
-            #left-panel, #right-panel, #center-panel { width: 100% !important; border: none !important; border-bottom: 2px solid var(--click-color) !important; box-sizing: border-box; flex-shrink: 1; height: auto !important; order: 0 !important; display: block !important; }
+            body, body.beta-ui { flex-direction: column !important; overflow-y: auto; height: auto; display: block; background-attachment: fixed;}
+            #left-panel, #right-panel, #center-panel { width: 100% !important; border: none !important; border-bottom: 2px solid var(--click-color) !important; box-sizing: border-box; flex-shrink: 1; height: auto !important; margin: 0 !important; border-radius: 0 !important;}
             #center-panel { min-height: 400px !important; display: flex !important; align-items: center; justify-content: center; }
-            #right-panel { display: flex; flex-direction: column !important; border-bottom: none !important; padding: 10px !important; }
-            .tabs { flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto !important; width: 100% !important; padding: 5px !important; gap: 5px; background: transparent !important; }
-            .tab-btn { flex: 0 0 auto !important; border-left: none !important; border-bottom: 2px solid transparent !important; text-align: center !important; min-width: 80px;}
-            .tab-btn.active { border-bottom-color: var(--click-color) !important; background: rgba(255, 255, 255, 0.15) !important; border-left: none !important; }
+            #right-panel, body.beta-ui #right-panel { display: flex; flex-direction: column !important; border-bottom: none !important; padding: 10px !important; }
+            .tabs, body.beta-ui .tabs { flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto !important; width: 100% !important; padding: 5px !important; gap: 5px; background: transparent !important; }
+            .tab-btn, body.beta-ui .tab-btn { flex: 0 0 auto !important; border-left: none !important; border-bottom: 2px solid transparent !important; text-align: center !important; min-width: 80px; padding: 8px !important;}
+            .tab-btn.active, body.beta-ui .tab-btn.active { border-bottom-color: var(--click-color) !important; background: rgba(255, 255, 255, 0.15) !important; border-left: none !important; }
             .scene { transform: scale(0.85); margin-top: 40px !important; }
-            body.beta-ui #right-panel .tabs { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); width: 100%;}
         }
 
         /* =========================================
@@ -99,37 +87,30 @@
         .scene:active { transform: scale(0.92); } 
         
         .cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; animation: spin 15s infinite linear; }
-        .cube-face { 
-            position: absolute; width: 220px; height: 220px; border: 2px solid var(--click-color); 
-            background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; 
-            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5); font-size: 50px; 
-            text-shadow: 0 0 20px var(--click-color); border-radius: 16px; transition: 0.3s;
-        }
+        .cube-face { position: absolute; width: 220px; height: 220px; border: 2px solid var(--click-color); background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5); font-size: 50px; text-shadow: 0 0 20px var(--click-color); border-radius: 16px; transition: 0.3s; }
         .cube-face:hover { background: rgba(255, 255, 255, 0.1); box-shadow: inset 0 0 60px var(--click-color); }
+        
         body.theme-gold .cube-face { background: rgba(253, 224, 71, 0.15); box-shadow: inset 0 0 60px #eab308; border-color: #fef08a; }
-        body.galactic-active .cube-face { border-color: var(--galac-color); box-shadow: inset 0 0 80px var(--galac-color); text-shadow: 0 0 30px var(--galac-color); background: rgba(217, 70, 239, 0.2); }
+        body.galactic-active .cube-face { border-color: var(--galac-color) !important; box-shadow: inset 0 0 80px var(--galac-color) !important; text-shadow: 0 0 30px var(--galac-color) !important; background: rgba(217, 70, 239, 0.2) !important; }
         
-        /* Corruption Boss Fight Styles */
-        .scene.corrupted .cube-face { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.2) !important; box-shadow: inset 0 0 80px #991b1b !important; text-shadow: 0 0 30px #ef4444 !important; animation: shake 0.5s infinite; }
-        #corrupt-ui { display: none; position: absolute; top: 10%; text-align: center; color: #ef4444; text-shadow: 0 0 10px #ef4444; font-weight: 900; z-index: 5;}
-
+        /* Anomalies */
+        .scene.frozen .cube-face { border-color: #7dd3fc !important; background: rgba(125, 211, 252, 0.4) !important; box-shadow: inset 0 0 80px #0284c7 !important; animation: none !important; backdrop-filter: blur(5px); }
+        .scene.overcharge .cube-face { border-color: #fde047 !important; background: rgba(253, 224, 71, 0.3) !important; box-shadow: inset 0 0 100px #ca8a04 !important; animation: spinFast 2s infinite linear; }
+        
         /* Cube Faces */
-        .front { transform: rotateY(0deg) translateZ(110px); } 
-        .right { transform: rotateY(90deg) translateZ(110px); } 
-        .back { transform: rotateY(180deg) translateZ(110px); } 
-        .left { transform: rotateY(-90deg) translateZ(110px); } 
-        .top { transform: rotateX(90deg) translateZ(110px); } 
-        .bottom { transform: rotateX(-90deg) translateZ(110px); }
-        
+        .front { transform: rotateY(0deg) translateZ(110px); } .right { transform: rotateY(90deg) translateZ(110px); } .back { transform: rotateY(180deg) translateZ(110px); } .left { transform: rotateY(-90deg) translateZ(110px); } .top { transform: rotateX(90deg) translateZ(110px); } .bottom { transform: rotateX(-90deg) translateZ(110px); }
         @keyframes spin { 100% { transform: rotateX(360deg) rotateY(360deg); } }
-        @keyframes shake { 0%, 100% { transform: translate(1px, 1px) rotate(0deg); } 25% { transform: translate(-1px, -2px) rotate(-1deg); } 50% { transform: translate(-3px, 0px) rotate(1deg); } 75% { transform: translate(3px, 2px) rotate(0deg); } }
+        @keyframes spinFast { 100% { transform: rotateX(1080deg) rotateY(1080deg); } }
+
+        /* Meteor Shower */
+        .meteor { position: absolute; font-size: 24px; cursor: pointer; animation: fall linear forwards; z-index: 100; filter: drop-shadow(0 0 5px #fbbf24);}
+        @keyframes fall { 0% { transform: translate(0, -50px) rotate(0deg); opacity: 1;} 100% { transform: translate(var(--endX), 100vh) rotate(360deg); opacity: 0;} }
 
         /* =========================================
            UI COMPONENTS & BUTTONS
         ========================================= */
         h2, h3 { margin: 0 0 5px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
         .cat-header { background: rgba(0, 0, 0, 0.5); padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold; color: var(--click-color); margin: 15px 0 10px 0; border-left: 3px solid var(--click-color); }
-        
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         .stat-box { background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: var(--radius-sm); display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05); }
         .stat-val { font-weight: 900; font-size: 16px; margin-top: 4px; }
@@ -144,18 +125,40 @@
         .tab-content { display: none; flex-grow: 1; overflow-y: auto; padding-right: 5px; width: 100%;}
         .tab-content.active { display: block; }
 
-        /* Cards */
+        /* Cards & Eggs */
         .card { background: rgba(0, 0, 0, 0.4); padding: 12px; margin-bottom: 10px; border-radius: var(--radius-md); border-left: 4px solid #475569; position: relative; transition: 0.2s; }
         .card:hover { background: rgba(0, 0, 0, 0.6); }
         .card h4 { margin: 0 0 4px 0; font-size: 13px; display: flex; justify-content: space-between; align-items: center;}
         .card p { margin: 2px 0; font-size: 11px; color: var(--text-muted); line-height: 1.3; }
         
+        .egg-Common { border-left-color: #94a3b8 !important; } .egg-Uncommon { border-left-color: #4ade80 !important; } .egg-Rare { border-left-color: #38bdf8 !important; } .egg-Epic { border-left-color: #a855f7 !important; } .egg-Legendary { border-left-color: #e879f9 !important; }
+
         .badge { background: rgba(255, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
         
         /* Action Buttons */
         .btn-act { background: var(--click-color); color: #000; border: none; padding: 8px; cursor: pointer; border-radius: var(--radius-sm); font-weight: bold; width: 100%; margin-top: 8px; font-size: 12px; transition: 0.2s; }
         .btn-act:hover:not(:disabled) { filter: brightness(1.2); transform: translateY(-1px); }
         .btn-act:disabled { background: #334155 !important; color: var(--text-muted) !important; cursor: not-allowed; opacity: 0.6; }
+
+        /* Cosmic Ability Buttons */
+        .btn-ability {
+            background: linear-gradient(45deg, #fde047, #ca8a04);
+            color: #000; font-weight: 900; text-transform: uppercase;
+            border: 2px solid #fff; border-radius: 8px; padding: 12px; width: 100%; margin-top: 10px;
+            box-shadow: 0 0 15px rgba(202, 138, 4, 0.8); cursor: pointer; transition: all 0.3s ease;
+        }
+        .btn-ability:hover:not(:disabled) {
+            transform: scale(1.03); box-shadow: 0 0 25px rgba(253, 224, 71, 1);
+        }
+        .btn-ability:disabled { background: #334155 !important; color: var(--text-muted) !important; border: 2px solid #475569; box-shadow: none; cursor: not-allowed; }
+        
+        .btn-ability-ts {
+            background: linear-gradient(45deg, #e9d5ff, #a855f7);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.8);
+        }
+        .btn-ability-ts:hover:not(:disabled) {
+            box-shadow: 0 0 25px rgba(233, 213, 255, 1);
+        }
 
         /* Combo System */
         #combo-container { margin-top: 30px; text-align: center; width: 80%; z-index: 5;}
@@ -174,14 +177,14 @@
         
         /* Floating Notifications */
         #notif-area { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 5px; z-index: 200; pointer-events: none;}
-        .notif { background: rgba(0, 0, 0, 0.9); border: 2px solid var(--coin-color); padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; animation: fadeUp 3.5s forwards; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .notif { background: rgba(0, 0, 0, 0.9); border: 2px solid var(--coin-color); padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 10%, 90% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-30px); } }
         
         .float-txt { position: absolute; font-weight: 800; font-size: 16px; pointer-events: none; animation: floatUp 1s ease-out forwards; text-align: center; z-index: 100; text-shadow: 0 2px 4px #000; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0px) scale(0.8); } 100% { opacity: 0; transform: translateY(-50px) scale(1.1); } }
 
-        /* Minigame */
-        .mine-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 15px; perspective: 600px; }
+        /* Minigame 1: Mining */
+        .mine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 15px; perspective: 600px; }
         .mine-tile { background: rgba(0,0,0,0.6); border: 2px solid #334155; height: 60px; border-radius: 8px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.5s; display: flex; align-items: center; justify-content: center; }
         .mine-tile.flipped { transform: rotateY(180deg); cursor: default; }
         .tile-front, .tile-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; text-align: center; padding: 2px; box-sizing: border-box; }
@@ -190,13 +193,18 @@
         .r-norm { background: #334155; border-color: #64748b; color: #fff;} .r-rare { background: #1e3a8a; border-color: #3b82f6; color: #93c5fd;} .r-epic { background: #4a044e; border-color: #a855f7; color: #e9d5ff; box-shadow: 0 0 10px #a855f7;} .r-leg { background: #452e04; border-color: #eab308; color: #fef08a; box-shadow: 0 0 15px #eab308;}
         .mine-summary { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius-md); z-index: 20; text-align: center; padding: 20px; }
 
+        /* Minigame 2: Hacking */
+        #hack-bar-bg { width: 100%; height: 30px; background: #334155; border-radius: 15px; position: relative; overflow: hidden; border: 2px solid #475569; margin: 20px 0;}
+        #hack-target { position: absolute; height: 100%; width: 30%; left: 35%; background: rgba(74, 222, 128, 0.4); border-left: 2px solid #4ade80; border-right: 2px solid #4ade80; }
+        #hack-cursor { position: absolute; height: 100%; width: 4px; background: white; left: 0%; box-shadow: 0 0 10px white; }
+
         /* Relics */
         .relic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; max-width: 200px; margin: 10px auto; }
         .relic-pc { width: 60px; height: 60px; background: rgba(0, 0, 0, 0.5); border: 1px solid #475569; display: flex; align-items: center; justify-content: center; font-size: 24px; opacity: 0.3; }
         .relic-pc.found { opacity: 1; border-color: var(--gem-color); background: rgba(232, 121, 249, 0.2); box-shadow: 0 0 10px var(--gem-color); }
 
         /* Pets UI - Selection */
-        .pet-card { border: 2px solid transparent; }
+        .pet-card { border: 2px solid transparent; cursor: pointer;}
         .pet-card.selected-fuse { border-color: var(--gem-color); box-shadow: 0 0 10px var(--gem-color); background: rgba(232, 121, 249, 0.15); }
         .pet-card.selected-exped { border-color: #4ade80; box-shadow: 0 0 10px #4ade80; background: rgba(74, 222, 128, 0.15); }
 
@@ -219,7 +227,7 @@
     <div id="offline-modal">
         <div class="modal-content">
             <h2 style="color: var(--click-color)">Welcome Back, Miner!</h2>
-            <p style="color: var(--text-muted)">Your systems ran slowly while you were away (Min 5m, Max 2h).</p>
+            <p style="color: var(--text-muted)">Your systems ran slowly while you were away (Min 5m, Max 12h).</p>
             <p>Time Away: <strong id="off-time">0</strong></p>
             <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; margin: 15px 0;">
                 <h3 style="margin-top:0;">Gains Collected:</h3>
@@ -242,10 +250,10 @@
 
         <h3 style="margin-top: 15px; font-size: 14px;">Live Stats</h3>
         <p style="font-size: 12px; margin: 3px 0;">Click Power: <strong id="v-pwr" style="color: white">1</strong></p>
-        <p style="font-size: 12px; margin: 3px 0;">TCM (Total Mult): <strong id="v-mult" style="color: #4ade80">x1</strong></p>
+        <p style="font-size: 12px; margin: 3px 0;" title="Total Click Multiplier">TCM (Multiplier): <strong id="v-mult" style="color: #4ade80">x1</strong></p>
         <p style="font-size: 12px; margin: 3px 0;">Coin Chance: <strong class="color-coins" id="v-chance">5%</strong></p>
         <p style="font-size: 12px; margin: 3px 0;">Mat Chance: <strong class="color-mat" id="v-matc">4.0%</strong></p>
-        <p style="font-size: 12px; margin: 3px 0;">Gem Chance: <strong class="color-gems" id="v-gemc">0.00001%</strong></p>
+        <p style="font-size: 12px; margin: 3px 0;">Gem Chance: <strong class="color-gems" id="v-gemc">0.0001%</strong></p>
         <p style="font-size: 12px; margin: 3px 0;">Auto Clicks/s: <strong id="v-cps" class="color-clicks">0</strong></p>
         
         <h3 style="margin-top: 20px; font-size: 14px;">Active Gear & Abils</h3>
@@ -258,12 +266,10 @@
     <div id="center-panel">
         <h1 style="position: absolute; top: 20px; font-weight: 900; font-size: 38px; text-shadow: 0 0 20px var(--click-color); letter-spacing: 2px;">NEON CORE</h1>
         
-        <!-- Boss Fight UI -->
-        <div id="corrupt-ui">
-            <h2>🚨 CORRUPTION DETECTED 🚨</h2>
-            <p>AUTOCLICKERS OFFLINE. COINS DRAINING.</p>
-            <h1 style="font-size: 40px; margin: 5px;">PURIFY: <span id="crpt-clicks">0</span>/100</h1>
-            <p>Time Remaining: <span id="crpt-time">15</span>s</p>
+        <!-- Anomaly UI -->
+        <div id="anomaly-ui" style="display: none; position: absolute; top: 15%; text-align: center; z-index: 10;">
+            <h2 id="ano-title" style="color: #fde047; text-shadow: 0 0 10px #ca8a04; font-size: 28px; margin:0;">ANOMALY DETECTED</h2>
+            <p id="ano-desc" style="font-weight:bold; margin-top:5px;"></p>
         </div>
 
         <div class="scene" id="main-scene" onclick="clickCore(event)">
@@ -271,7 +277,7 @@
                 <div class="cube-face front" id="core-icon">⚡</div>
                 <div class="cube-face back" id="core-icon-2">⚡</div>
                 <div class="cube-face right" id="core-icon-3">⚡</div>
-                <div class="cube-face left" id="core-icon-4">⚡</div> 
+                <div class="cube-face left" id="core-icon-4">⚡</div>
                 <div class="cube-face top" id="core-icon-5">⚡</div>
                 <div class="cube-face bottom" id="core-icon-6">⚡</div>
             </div>
@@ -292,19 +298,35 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="sTab('t-upg')">Upgrades</button>
             <button class="tab-btn" onclick="sTab('t-n-rebirth')" style="color:#38bdf8">Evolutions</button>
-            <button class="tab-btn" onclick="sTab('t-mine')">Mining</button>
+            <button class="tab-btn" onclick="sTab('t-mine')">Minigames</button>
             <button class="tab-btn" onclick="sTab('t-inv')">Inventory</button>
             <button class="tab-btn" onclick="sTab('t-craft')">Crafting</button>
             <button class="tab-btn" onclick="sTab('t-mark')">Market</button>
             <button class="tab-btn" onclick="sTab('t-shop')">Shop</button>
             <button class="tab-btn" onclick="sTab('t-quest')">Quests</button>
-            <button class="tab-btn" onclick="sTab('t-galac')" style="color:var(--galac-color)">Galactic</button>
+            <button class="tab-btn" onclick="sTab('t-ach')" style="color:#fbbf24">Trophies</button>
+            <button class="tab-btn" onclick="sTab('t-galac')" style="color:var(--galac-color)">Galac (EVENT)</button>
             <button class="tab-btn" onclick="sTab('t-rebirth')" style="color:var(--gem-color)">Cosmic</button>
             <button class="tab-btn" onclick="sTab('t-set')">⚙️ Settings</button>
         </div>
 
-        <!-- Tab 1: Upgrades -->
-        <div id="t-upg" class="tab-content active"><div id="c-upg"></div></div>
+        <!-- Tab 1: Upgrades & Autobuyers -->
+        <div id="t-upg" class="tab-content active">
+            <div id="c-upg"></div>
+            
+            <div class="cat-header" style="border-color:#fbbf24; color:#fbbf24; margin-top:25px;">Automation Settings</div>
+            <div id="c-autobuy-lock">
+                <div class="card" style="border-color:#fbbf24; text-align:center;">
+                    <h4>Auto-Buyer Protocol</h4>
+                    <p>Automatically purchases upgrades in the background. Persists through Rebirths/Evolutions.</p>
+                    <button class="btn-act" onclick="unlockAutoBuyer()" style="background:#fbbf24; color:black;">Unlock (10,000 Coins)</button>
+                </div>
+            </div>
+            <div id="c-autobuy-ui" style="display:none;">
+                <p style="font-size:11px; color:#aaa; margin-top:0;">Toggle updates to auto-buy, and set maximum level limits.</p>
+                <div id="c-ab-list"></div>
+            </div>
+        </div>
 
         <!-- Tab 1.5: Evolutions -->
         <div id="t-n-rebirth" class="tab-content">
@@ -337,11 +359,22 @@
             </div>
             <div id="c-quest"></div>
         </div>
+
+        <!-- Tab 2.5: Trophies (Achievements) -->
+        <div id="t-ach" class="tab-content">
+            <div style="text-align:center; margin-bottom:15px;">
+                <h3 style="color:#fbbf24;">Trophy Room</h3>
+                <p style="font-size:11px; color:#aaa;">Each unlocked achievement grants <strong style="color:white;">+2% TCM (Multiplicative)</strong> permanently!</p>
+                <p style="font-size:14px; color:#4ade80; font-weight:bold; margin-top:5px;">Current Bonus: <span id="ach-bonus-txt">+0%</span></p>
+            </div>
+            <div id="c-ach"></div>
+        </div>
         
-        <!-- Tab 3: Mining Minigame -->
+        <!-- Tab 3: Minigames -->
         <div id="t-mine" class="tab-content">
+            <div class="cat-header">Deep Core Mining (4x4)</div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                <div><h3 style="margin:0; border:none;">Core Mining</h3><p style="margin:0; font-size:11px; color:var(--text-muted);">Cost: 20 Coins.</p></div>
+                <div><p style="margin:0; font-size:11px; color:var(--text-muted);">Cost: 20 Coins.</p></div>
                 <button id="btn-start-mine" class="btn-act" style="width: auto; margin:0;" onclick="startMine()">Play (20 Coins)</button>
             </div>
             <div style="text-align: center; margin-top: 10px; font-size: 13px; font-weight: bold;">Status: <span id="mine-status" class="color-clicks">Ready</span> | Picks: <span id="mine-picks">0</span></div>
@@ -355,6 +388,22 @@
             </div>
             <div class="cat-header">Mining Upgrades</div>
             <div id="c-mine-upg"></div>
+
+            <div class="cat-header" style="border-color:#a855f7; color:#a855f7; margin-top:30px;">Core Hacking Protocol</div>
+            <div class="card" style="border-color:#a855f7;">
+                <p style="font-size:11px; color:#aaa; margin-top:0;">Stop the cursor in the green zone! 3 Tries. 5 Min CD.</p>
+                <p style="font-size:12px; font-weight:bold;">Tries Left: <span id="hack-tries">3</span> | Hacks: <span id="hack-succ" style="color:#4ade80;">0</span></p>
+                
+                <div id="hack-bar-bg">
+                    <div id="hack-target"></div>
+                    <div id="hack-cursor"></div>
+                </div>
+                
+                <button class="btn-act" id="btn-start-hack" onclick="startHack()" style="background:#a855f7;">Start Hack (50 Coins)</button>
+                <button class="btn-act" id="btn-do-hack" onclick="hitHack()" style="background:#4ade80; color:black; display:none; font-size:16px;">HACK!</button>
+                
+                <div id="hack-res" style="text-align:center; font-weight:bold; margin-top:10px; display:none;"></div>
+            </div>
         </div>
 
         <!-- Tab 4: Inventory -->
@@ -366,8 +415,10 @@
                 <div class="stat-box"><span>Star Shard</span><span id="i-shard" class="stat-val color-mat">0</span></div>
                 <div class="stat-box"><span>Void Matter</span><span id="i-void" class="stat-val color-mat">0</span></div>
             </div>
-            <div class="stat-box" style="border-color: var(--dm-color); margin-bottom: 15px;"><span>Dark Matter</span><span id="i-dm" class="stat-val color-dm">0</span></div>
-            <div class="stat-box" style="border-color: var(--galac-color); margin-bottom: 15px;"><span>Galactic Stones</span><span id="i-galac" class="stat-val color-galac">0</span></div>
+            <div class="grid-2">
+                <div class="stat-box" style="border-color: var(--dm-color);"><span>Dark Matter</span><span id="i-dm" class="stat-val color-dm">0</span></div>
+                <div class="stat-box" style="border-color: var(--galac-color);"><span>Galactic Stones</span><span id="i-galac" class="stat-val color-galac">0</span></div>
+            </div>
             
             <div class="cat-header">Relic Fragments (Found in Cores)</div>
             <p style="font-size: 11px; text-align: center; color: var(--text-muted);">Find all 9 for a permanent 5x TCM!</p>
@@ -409,11 +460,11 @@
             </div>
             
             <div id="craft-opts">
-                <div class="card"><h4>🥚 Common Egg</h4><p>35 Scrap, 2 Dust, 2k Clicks</p><button class="btn-act" id="btn-cr-com" onclick="startCraft('Common')">Craft (2m)</button></div>
-                <div class="card"><h4>🥚 Uncommon Egg</h4><p>80 Scrap, 5 Dust, 1 Shard, 8k Clicks</p><button class="btn-act" id="btn-cr-unc" onclick="startCraft('Uncommon')">Craft (5m)</button></div>
-                <div class="card"><h4>🥚 Rare Egg</h4><p>200 Scrap, 15 Dust, 3 Shards, 50k Clicks</p><button class="btn-act" id="btn-cr-rar" onclick="startCraft('Rare')">Craft (15m)</button></div>
-                <div class="card"><h4>🥚 Epic Egg</h4><p>500 Scrap, 35 Dust, 5 Shards, 1.25M Clicks</p><button class="btn-act" id="btn-cr-epi" onclick="startCraft('Epic')">Craft (45m)</button></div>
-                <div class="card" style="border-color: var(--gem-color);"><h4>🥚 Legendary Egg</h4><p>800 Scrap, 100 Dust, 20 Shards, 1 Void, 5M Clicks</p><button class="btn-act" id="btn-cr-leg" onclick="startCraft('Legendary')" style="background: var(--gem-color); color: #000;">Craft (2h)</button></div>
+                <div class="card egg-Common"><h4>🥚 Common Egg</h4><p>35 Scrap, 2 Dust, 2k Clicks</p><button class="btn-act" id="btn-cr-com" onclick="startCraft('Common')">Craft (2m)</button></div>
+                <div class="card egg-Uncommon"><h4>🥚 Uncommon Egg</h4><p>80 Scrap, 5 Dust, 1 Shard, 8k Clicks</p><button class="btn-act" id="btn-cr-unc" onclick="startCraft('Uncommon')">Craft (5m)</button></div>
+                <div class="card egg-Rare"><h4>🥚 Rare Egg</h4><p>200 Scrap, 15 Dust, 3 Shards, 50k Clicks</p><button class="btn-act" id="btn-cr-rar" onclick="startCraft('Rare')">Craft (15m)</button></div>
+                <div class="card egg-Epic"><h4>🥚 Epic Egg</h4><p>500 Scrap, 35 Dust, 5 Shards, 1.25M Clicks</p><button class="btn-act" id="btn-cr-epi" onclick="startCraft('Epic')">Craft (45m)</button></div>
+                <div class="card egg-Legendary"><h4>🥚 Legendary Egg</h4><p>800 Scrap, 100 Dust, 20 Shards, 1 Void, 5M Clicks</p><button class="btn-act" id="btn-cr-leg" onclick="startCraft('Legendary')" style="background: var(--gem-color); color: #000;">Craft (2h)</button></div>
             </div>
 
             <div class="cat-header" style="border-color: var(--dm-color); color: var(--dm-color)">The Forge</div>
@@ -463,7 +514,7 @@
                 <button class="btn-act" id="b-shop-gold" onclick="buyShopItem('gold')" style="background:var(--coin-color); color:#000;">Buy: 1 Gem</button>
             </div>
 
-            <div class="cat-header">Artifacts (Spend Gems)</div>
+            <div class="cat-header">Artifacts (Spend Gems & Materials)</div>
             <div class="card" style="border-color: var(--gem-color)">
                 <h4>Time Relic</h4><p>Speeds up crafting times by 20%.</p>
                 <button class="btn-act" id="b-art-time" onclick="buyArt('time')" style="background: var(--gem-color)">Buy: 2 Gems</button>
@@ -471,6 +522,18 @@
             <div class="card" style="border-color: var(--gem-color)">
                 <h4>Core Magnet</h4><p>Doubles Golden Core spawn rates.</p>
                 <button class="btn-act" id="b-art-mag" onclick="buyArt('magnet')" style="background: var(--gem-color)">Buy: 5 Gems</button>
+            </div>
+            <div class="card" style="border-color: var(--coin-color)">
+                <h4>Four-Leaf Clover</h4><p>Base Coin chance +2%.</p>
+                <button class="btn-act" id="b-art-clov" onclick="buyArt('clover')">Buy: 30k Coins, 500 Scr, 100 Dst</button>
+            </div>
+            <div class="card" style="border-color: var(--coin-color)">
+                <h4>Overclock Battery</h4><p>Auto-Clicker speed +50%.</p>
+                <button class="btn-act" id="b-art-batt" onclick="buyArt('battery')">Buy: 150k Coins, 2k Scr, 10 Shd</button>
+            </div>
+            <div class="card" style="border-color: var(--coin-color)">
+                <h4>Deep Scanner</h4><p>+2 Minigame Picks permanently.</p>
+                <button class="btn-act" id="b-art-scan" onclick="buyArt('scanner')">Buy: 800k Coins, 10k Scr, 2 Vd</button>
             </div>
             
             <div class="cat-header">Theme Blueprints (Permanent)</div>
@@ -483,6 +546,7 @@
                 <h3 style="color: var(--galac-color); font-size: 24px; margin-bottom: 5px;">🌌 Galactic Event 🌌</h3>
                 <p id="ge-timer-txt" style="font-size: 14px; font-weight:bold; color: #fff;">Next Event in: --:--</p>
                 <p style="font-size: 11px; margin:10px 0; color: #ccc;">Events last 1 minute. The core turns purple.<br>Clicking has a 0.1% chance to drop Galactic Stones.<br>Stones can also be found in 5x (20%) and 20x (70%) Cores.</p>
+                <p style="font-weight:bold; margin-top:5px;">Your Stones: <span id="ge-stone-count" style="color:var(--galac-color); font-size:16px;">0</span></p>
             </div>
             
             <div class="cat-header" style="border-color:var(--galac-color); color:var(--galac-color);">Event Shop</div>
@@ -519,13 +583,13 @@
             <div class="card" style="border-color: #fde047; margin-top: 15px;">
                 <h4 style="color: #fde047; font-size: 16px;">🎲 Golden Dice <span class="badge" id="sk-gd-lvl">Lvl 0/6</span></h4>
                 <p id="sk-gd-desc" style="font-size: 12px; color: #fff;">Turns dice golden periodically, massively boosting all stats temporarily.</p>
-                <button class="btn-act" id="btn-sk-gd" onclick="upgSkill('gd')" style="background: #fde047; color: #000;"></button>
+                <button class="btn-ability" id="btn-sk-gd" onclick="upgSkill('gd')"></button>
             </div>
 
             <div class="card" style="border-color: #e9d5ff;">
                 <h4 style="color: #e9d5ff; font-size: 16px;">⏳ Timeskip <span class="badge" id="sk-ts-lvl">Lvl 0/6</span></h4>
                 <p id="sk-ts-desc" style="font-size: 12px; color: #fff;">Periodically skips time, granting you minutes worth of automated resources instantly.</p>
-                <button class="btn-act" id="btn-sk-ts" onclick="upgSkill('ts')" style="background: #e9d5ff; color: #000;"></button>
+                <button class="btn-ability btn-ability-ts" id="btn-sk-ts" onclick="upgSkill('ts')"></button>
             </div>
         </div>
 
@@ -533,7 +597,7 @@
         <div id="t-set" class="tab-content">
             <div class="cat-header">Game Settings</div>
             <div class="card">
-                <p style="font-size: 12px; margin-bottom: 10px;">Toggle New UI Layout (Beta): Re-arranges the layout completely.</p>
+                <p style="font-size: 12px; margin-bottom: 10px;">Toggle New UI Layout (Beta): Re-arranges the layout completely and changes all visual aesthetics.</p>
                 <button class="btn-act" onclick="toggleBetaUI()" id="btn-beta-ui" style="background:#4ade80; color:#000;">Enable Beta UI</button>
             </div>
             
@@ -541,7 +605,7 @@
             <div class="card">
                 <p><strong>Base Coin Chance:</strong> 5.00%</p>
                 <p><strong>Base Mat Chance:</strong> 4.00%</p>
-                <p><strong>Base Gem Chance:</strong> 0.00001%</p>
+                <p><strong>Base Gem Chance:</strong> 0.0001%</p>
                 <p><strong>Raw Click Drops:</strong> 0.5% for 2 Coins, 0.05% for 10 Coins.</p>
                 <p><strong>Minigame Odds:</strong> 79% Norm, 15% Rare, 5% Epic, 1% Leg.</p>
             </div>
@@ -560,6 +624,9 @@
             <button class="btn-act" onclick="wipeSave()" style="background: #ef4444; color: #fff; margin-top: 15px;">HARD RESET (Wipe All Data)</button>
         </div>
     </div>
+
+    <!-- METEOR CONTAINER -->
+    <div id="meteor-container"></div>
 
     <script>
         // --- 1. AUDIO SYSTEM ---
@@ -585,26 +652,29 @@
         let game = {
             curr: { clicks: 0, coins: 0, gems: 0, cp: 0, dm: 0 },
             mats: { scrap: 0, dust: 0, shard: 0, void: 0, gStone: 0 },
-            stat: { playtime: 0, tClicks: 0, rebirths: 0, mult: 1, bestCombo: 0, cClear: 0, epicCores: 0, legCores: 0, manualClicks: 0, mgPlayed: 0 },
-            base: { coin: 0.05, mat: 0.04, gem: 0.0000001 },
-            upg: { pwr: 0, clickMult: 0, coinClick: 0, coin: 0, pass: 0, auto: 0, mat: 0, comboM: 0 },
+            stat: { playtime: 0, tClicks: 0, rebirths: 0, mult: 1, bestCombo: 0, epicCores: 0, legCores: 0, manualClicks: 0, mgPlayed: 0 },
+            base: { coin: 0.05, mat: 0.04, gem: 0.000001 },
+            upg: { pwr: 0, clickMult: 0, comboM: 0, coinClick: 0, coin: 0, pass: 0, auto: 0, mat: 0, crit: 0, gemFind: 0 },
             mineUpg: { cd: 0, loot: 0 },
             forgeUpg: { combo: 0 },
-            shop: { auto: false, goldAuto: false, themes: ['default'], eqTheme: 'default', arts: { time: false, magnet: false } },
+            shop: { auto: false, goldAuto: false, themes: ['default'], eqTheme: 'default', arts: { time: false, magnet: false, clover: false, battery: false, scanner: false } },
+            autoBuyer: { unlocked: false, conf: {} },
             equipInv: { pick: false, aura: false }, 
             equipEq: { pick: false, aura: false },
             pets: { eggs: [], inv: [], eq: null },
             craft: { active: false, type: null, start: 0, end: 0 },
             quest: { time: {s:0}, clicks: {s:0}, mine: {s:0}, mats: {s:0} },
             mine: { active: false, cd: 0, picks: 0, loot: { coin:0, scrap:0, dust:0, shard:0, void:0, gem:0 } },
+            hack: { tries: 0, succ: 0, pos: 0, dir: 1, active: false, frame: null, cd: 0 },
             skills: { gd: 0, ts: 0 },
             timers: { gc: 0, gd: 0, ts: 0, lastGcDrop: Date.now() },
             activeAbils: { gdEnd: 0 },
-            corrupt: { active: false, clicks: 0, end: 0, cd: Date.now() + 300000 },
+            anomaly: { active: false, type: null, end: 0, clicks: 0 },
             galac: { active: false, next: Date.now() + 1800000, end: 0, potsBought: 0 },
             market: { bmDeals: [], bmNext: 0 },
             exped: { active: false, end: 0, petId: null, readyToClaim: false, rD: 0, rS: 0, rPId: null },
             relics: [false, false, false, false, false, false, false, false, false],
+            ach: [],
             normalReb: 0,
             offlineBank: 0,
             bounty: { t: 'coins', c: 0, m: 5000, r: 1, txt: 'Get 5,000 Coins' },
@@ -617,31 +687,44 @@
         let combo = 0; 
         let lastManClick = 0;
 
-        // Upgrades
-        const clickCoinCosts = [2500, 20000, 150000, 1000000, 5000000, 15000000, 35000000, 60000000, 85000000, 100000000];
+        // Upgrades & Trophies
+        const clickCoinCosts = [2500, 20000, 150000, 1000000, 5000000, 15000000, 35000000, 60000000, 85000000, 100000000, 250000000, 500000000, 1000000000, 2500000000, 5000000000, 10000000000, 25000000000, 50000000000, 75000000000, 100000000000];
         const normRebDB = [
-            { req: 10000, desc: "2x Clicks", m: 2, cb: 0, mb: 0 },
-            { req: 80000, desc: "3x Clicks", m: 3, cb: 0, mb: 0 },
-            { req: 175000, desc: "4x Clicks", m: 4, cb: 0, mb: 0 },
-            { req: 500000, desc: "6x Clicks", m: 6, cb: 0, mb: 0 },
-            { req: 1250000, desc: "8x Clicks", m: 8, cb: 0, mb: 0 },
-            { req: 3000000, desc: "10x Clicks", m: 10, cb: 0, mb: 0 },
-            { req: 8500000, desc: "12x Clicks", m: 12, cb: 0, mb: 0 },
+            { req: 10000, desc: "2x TCM", m: 2, cb: 0, mb: 0 },
+            { req: 80000, desc: "3x TCM", m: 3, cb: 0, mb: 0 },
+            { req: 175000, desc: "4x TCM", m: 4, cb: 0, mb: 0 },
+            { req: 500000, desc: "6x TCM", m: 6, cb: 0, mb: 0 },
+            { req: 1250000, desc: "8x TCM", m: 8, cb: 0, mb: 0 },
+            { req: 3000000, desc: "10x TCM", m: 10, cb: 0, mb: 0 },
+            { req: 8500000, desc: "12x TCM", m: 12, cb: 0, mb: 0 },
             { req: 25000000, desc: "+1% Coin Chance", m: 12, cb: 0.01, mb: 0 },
             { req: 50000000, desc: "+1% Material Chance", m: 12, cb: 0.01, mb: 0.01 },
             { req: 200000000, desc: "+2% Coin Chance & Cosmic Unlocked", m: 12, cb: 0.03, mb: 0.01 }
         ];
 
         const upgDB = {
-            pwr: { cat: "Click Modifiers", n: "Power Click", d: "+1 Base Click.", cType: "coins", c: 2, m: 1.5, mx: 999 },
-            clickMult: { cat: "Click Modifiers", n: "Click Synergy", d: "+1.25x Multiplier to Clicks.", cType: "clicks", c: 1000, m: 3.0, mx: 20 },
-            comboM: { cat: "Click Modifiers", n: "Combo Mastery", d: "+0.5s Combo Hold Time.", cType: "clicks", c: 5000, m: 2.0, mx: 10 },
-            coinClick: { cat: "Click Modifiers", n: "Clicker's Luck", d: "+1% Coin chance.", cType: "clicks", cArr: clickCoinCosts, mx: 10 },
-            coin: { cat: "Passive Generation", n: "Coin Detector", d: "+1% Coin chance.", cType: "coins", c: 5, m: 2.5, mx: 10 },
-            pass: { cat: "Passive Generation", n: "Coin Mint", d: "+1 Coin/min.", cType: "coins", c: 5, m: 2.0, mx: 999 },
-            auto: { cat: "Passive Generation", n: "Autoclicker", d: "+1 Click/sec.", cType: "coins", c: 100, m: 3.0, mx: 20 },
-            mat: { cat: "Utility", n: "Material Radar", d: "+0.5% mat drop chance.", cType: "coins", c: 200, m: 2.5, mx: 10 }
+            pwr: { cat: "Click Modifiers", n: "Power Click", d: "+1 Base Click.", cType: "coins", c: 2, m: 1.5, mx: 9999 },
+            clickMult: { cat: "Click Modifiers", n: "Click Synergy", d: "+1.25x Multiplier to Clicks.", cType: "clicks", c: 2500, m: 3.0, mx: 50 },
+            crit: { cat: "Click Modifiers", n: "Critical Strike", d: "+1% chance for 5x clicks.", cType: "clicks", c: 50000, m: 3.5, mx: 20 },
+            comboM: { cat: "Click Modifiers", n: "Combo Mastery", d: "+0.5s Combo Hold Time.", cType: "clicks", c: 10000, m: 2.0, mx: 25 },
+            coinClick: { cat: "Click Modifiers", n: "Clicker's Luck", d: "+1% Coin chance.", cType: "clicks", cArr: clickCoinCosts, mx: 20 },
+            coin: { cat: "Passive Generation", n: "Coin Detector", d: "+1% Coin chance.", cType: "coins", c: 50, m: 2.5, mx: 25 },
+            pass: { cat: "Passive Generation", n: "Coin Mint", d: "+1 Coin/min.", cType: "coins", c: 50, m: 2.0, mx: 9999 },
+            auto: { cat: "Passive Generation", n: "Autoclicker", d: "+1 Click/sec.", cType: "coins", c: 500, m: 3.0, mx: 10 },
+            mat: { cat: "Utility", n: "Material Radar", d: "+0.5% mat drop chance.", cType: "coins", c: 500, m: 2.5, mx: 25 },
+            gemFind: { cat: "Utility", n: "Gem Resonance", d: "+0.00001% Base Gem chance.", cType: "coins", c: 100000, m: 4.0, mx: 10 }
         };
+
+        const achDB = [
+            { id: 'c1k', n: 'Baby Steps', d: 'Get 1,000 Total Clicks', c: () => game.stat.tClicks >= 1000 },
+            { id: 'c100k', n: 'Clicker Pro', d: 'Get 100,000 Total Clicks', c: () => game.stat.tClicks >= 100000 },
+            { id: 'c1m', n: 'Millionaire', d: 'Get 1,000,000 Total Clicks', c: () => game.stat.tClicks >= 1000000 },
+            { id: 'co10k', n: 'Pocket Change', d: 'Get 10,000 Coins', c: () => game.curr.coins >= 10000 },
+            { id: 'm10', n: 'Miner', d: 'Play Minigames 10 times', c: () => game.stat.mgPlayed >= 10 },
+            { id: 'e1', n: 'Evolution I', d: 'Evolve once', c: () => game.normalReb >= 1 },
+            { id: 'cr1', n: 'Cosmic Entity', d: 'Cosmic Rebirth once', c: () => game.stat.rebirths >= 1 },
+            { id: 'g1', n: 'Shiny!', d: 'Find a Gem', c: () => game.curr.gems >= 1 }
+        ];
 
         const mineUpgDB = { 
             cd: { n: "Mining License", d: "-1 min Cooldown.", req: { coins: 500, scrap: 100 }, m: 2, mx: 5 }, 
@@ -649,10 +732,10 @@
         };
 
         const questDB = {
-            time: { n: "Time is Money", d: "Playtime", reqs: [300, 3600, 14400, 43200, 86400], r: [50, 250, 1000, 5000, 1], isGem: [false,false,false,false,true], c: () => game.stat.playtime },
-            clicks: { n: "Manual Labor", d: "Total Clicks", reqs: [1000, 10000, 100000, 1000000, 1000000000], r: [50, 250, 1000, 10000, 1], isGem: [false,false,false,false,true], c: () => game.stat.tClicks },
-            mine: { n: "Miner", d: "Minigames Played", reqs: [1, 5, 25, 100, 500], r: [50, 200, 1000, 5000, 1], isGem: [false,false,false,false,true], c: () => game.stat.mgPlayed },
-            mats: { n: "Scavenger", d: "Collect Scrap", reqs: [50, 250, 1000, 5000, 25000], r: [50, 200, 1000, 5000, 1], isGem: [false,false,false,false,true], c: () => game.mats.scrap }
+            time: { n: "Time is Money", d: "Playtime", reqs: [300, 3600, 14400, 43200, 86400], r: [5, 25, 100, 500, 1], isGem: [false,false,false,false,true], c: () => game.stat.playtime },
+            clicks: { n: "Manual Labor", d: "Total Clicks", reqs: [1000, 10000, 100000, 1000000, 1000000000], r: [5, 25, 100, 1000, 1], isGem: [false,false,false,false,true], c: () => game.stat.tClicks },
+            mine: { n: "Miner", d: "Minigames Played", reqs: [1, 5, 25, 100, 500], r: [5, 20, 100, 500, 1], isGem: [false,false,false,false,true], c: () => game.stat.mgPlayed },
+            mats: { n: "Scavenger", d: "Collect Scrap", reqs: [50, 250, 1000, 5000, 25000], r: [5, 20, 100, 500, 1], isGem: [false,false,false,false,true], c: () => game.mats.scrap }
         };
 
         const bountiesDB = [
@@ -675,6 +758,10 @@
             'glitter': { n: "Pink Glitter", cType: "coins", c: 350, reqMat: 'dust', mCost: 10, b: "+3 Pwr", css: "border-color: #f472b6;" },
             'gold': { n: "Golden Majesty", cType: "gems", c: 2, reqMat: 'shard', mCost: 5, b: "+25 Pwr, +5% Coin", css: "border-color: #eab308; background: rgba(234, 179, 8, 0.1);" },
             'void': { n: "Abyssal Void", cType: "gems", c: 5, reqMat: 'void', mCost: 50, b: "+100 Pwr, +10% Coin", css: "border-color: #c084fc; background: rgba(0, 0, 0, 0.8);" },
+            'inferno': { n: "Hellfire Inferno", cType: "gems", c: 15, reqMat: 'shard', mCost: 100, b: "+250 Pwr", css: "border-color: #ef4444; background: rgba(69, 10, 10, 0.9);" },
+            'cyber': { n: "Cyberpunk City", cType: "gems", c: 25, reqMat: 'dust', mCost: 500, b: "+50% Mat Chance", css: "border-color: #22d3ee; background: rgba(2, 6, 23, 0.9);" },
+            'matrix': { n: "Digital Matrix", cType: "gems", c: 35, reqMat: 'void', mCost: 5, b: "+250 Pwr, +100% Mat", css: "border-color: #4ade80; background: rgba(2, 44, 34, 0.9);" },
+            'plasma': { n: "Plasma Nebula", cType: "gems", c: 50, reqMat: 'shard', mCost: 200, b: "+400 Pwr, +20% Coin", css: "border-color: #818cf8; background: rgba(30, 27, 75, 0.9);" },
             'galactic': { n: "Galactic Nebula", cType: "gems", c: 999, reqMat: 'void', mCost: 999, b: "+500 Pwr, +25% Coin, +10% Mat", css: "border-color: #d946ef; background: rgba(46, 11, 87, 0.9);" }
         };
 
@@ -687,8 +774,8 @@
         };
 
         const rebReq = [
-            { c: 5000, v: 1, a: 2, m: 2 }, { c: 20000, v: 3, a: 5, m: 5 }, { c: 100000, v: 8, a: 10, m: 15 }, 
-            { c: 500000, v: 20, a: 15, m: 50 }, { c: 2500000, v: 50, a: 20, m: 200 }
+            { c: 5000, v: 1, a: 2, m: 2 }, { c: 50000, v: 5, a: 4, m: 5 }, { c: 500000, v: 15, a: 6, m: 15 }, 
+            { c: 5000000, v: 40, a: 8, m: 50 }, { c: 50000000, v: 100, a: 10, m: 200 }
         ];
 
         const gdLevels = [
@@ -703,12 +790,12 @@
         
         const tsLevels = [
             { cd: 0, sMins: 0, cps: 0 },
-            { cd: 15*60, sMins: 5, cps: 3, cst: 1 },
-            { cd: 13.5*60, sMins: 5.4, cps: 3.4, cst: 1 },
-            { cd: 12*60, sMins: 5.8, cps: 3.8, cst: 1 },
-            { cd: 10.5*60, sMins: 6.2, cps: 4.2, cst: 1 },
-            { cd: 9*60, sMins: 6.6, cps: 4.6, cst: 1 },
-            { cd: 8*60, sMins: 7, cps: 5, cst: 1 }
+            { cd: 15*60, sMins: 15, cps: 3, cst: 1 },
+            { cd: 13.5*60, sMins: 30, cps: 3.4, cst: 1 },
+            { cd: 12*60, sMins: 45, cps: 3.8, cst: 1 },
+            { cd: 10.5*60, sMins: 60, cps: 4.2, cst: 1 },
+            { cd: 9*60, sMins: 90, cps: 4.6, cst: 1 },
+            { cd: 8*60, sMins: 120, cps: 5, cst: 1 }
         ];
 
         // --- 3. SAVING & LOADING ---
@@ -722,17 +809,28 @@
             if(saved) {
                 try {
                     let parsed = JSON.parse(saved);
-                    Object.keys(game).forEach(k => { if(parsed[k] !== undefined) Object.assign(game[k], parsed[k]); });
+                    // Safe deep merge to prevent TypeError crashes
+                    function deepMerge(target, source) {
+                        for (let key in source) {
+                            if (source[key] !== undefined) {
+                                if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
+                                    if (!target[key]) target[key] = {};
+                                    deepMerge(target[key], source[key]);
+                                } else {
+                                    target[key] = source[key];
+                                }
+                            }
+                        }
+                    }
+                    deepMerge(game, parsed);
                     
-                    if(game.normalReb === undefined) game.normalReb = 0;
-                    if(game.offlineBank === undefined) game.offlineBank = 0;
-                    if(game.bounty === undefined) genBounty();
-                    if(game.exped && game.exped.petId === undefined) { game.exped.petId = null; game.exped.readyToClaim = false; game.exped.rPId = null;}
-                    if(game.market.bmNext === undefined) genBMDeals();
-                    if(game.mats.gStone === undefined) game.mats.gStone = 0;
-                    if(game.galac === undefined) game.galac = { active: false, next: Date.now() + 1800000, end: 0, potsBought: 0 };
-                    
-                    // Quest Migration (wipe old format if found)
+                    // Fallback re-initializations for safety
+                    if(!game.hack) game.hack = { tries: 0, succ: 0, pos: 0, dir: 1, active: false, frame: null, cd: 0 };
+                    if(!game.galac) game.galac = { active: false, next: Date.now() + 1800000, end: 0, potsBought: 0 };
+                    if(!game.anomaly) game.anomaly = { active: false, type: null, end: 0, clicks: 0 };
+                    if(!game.mine.loot) game.mine.loot = { coin:0, scrap:0, dust:0, shard:0, void:0, gem:0 };
+                    if(game.upg.crit === undefined) game.upg.crit = 0;
+                    if(game.upg.gemFind === undefined) game.upg.gemFind = 0;
                     if(typeof game.quest.time1 !== 'undefined') { game.quest = { time: {s:0}, clicks: {s:0}, mine: {s:0}, mats: {s:0} }; }
                     
                     game.fuseSelection = []; game.expedSelection = null;
@@ -741,22 +839,21 @@
                     document.body.className = `theme-${game.shop.eqTheme}`;
                     if(game.settings.betaUI) document.body.classList.add('beta-ui');
                     
-                    // Offline Progress 
                     let now = Date.now();
                     let diffSecs = Math.floor((now - game.lastSave) / 1000);
-                    if(diffSecs > 300) { // Min 5 minutes
-                        let cappedSecs = Math.min(diffSecs, 7200); // Max 2 hours
-                        let ticks = Math.floor(cappedSecs / 10); // Clicks equivalent to once every 10s
+                    if(diffSecs > 300) { 
+                        let cappedSecs = Math.min(diffSecs, 43200); // 12 hours max offline now
+                        let ticks = Math.floor(cappedSecs / 5); // Simulating 1 click every 5 seconds
                         let offClicks = ticks * getPwr();
                         let offCoins = 0;
-                        for(let i=0; i<ticks; i++) { if(Math.random() < getCoinC()) offCoins += 1 * getMult(); }
+                        for(let i=0; i<ticks; i++) { if(Math.random() < getCoinC()) offCoins += 1; }
                         
                         if(offCoins > 0 || offClicks > 0) {
                             game.curr.coins += offCoins; game.curr.clicks += offClicks; game.stat.tClicks += offClicks;
                             progBounty('coins', offCoins); progBounty('clicks', offClicks);
                             
                             let h = Math.floor(cappedSecs/3600); let m = Math.floor((cappedSecs%3600)/60);
-                            document.getElementById('off-time').innerText = `${h}h ${m}m (Capped at 2h)`;
+                            document.getElementById('off-time').innerText = `${h}h ${m}m (Capped at 12h)`;
                             document.getElementById('off-clicks').innerText = fNum(offClicks);
                             document.getElementById('off-coins').innerText = fNum(offCoins);
                             document.getElementById('offline-modal').style.display = 'flex';
@@ -766,15 +863,26 @@
             }
             if(!game.bounty || !game.bounty.t) genBounty();
             if(!game.market.bmNext || game.market.bmDeals.length === 0) genBMDeals();
+            for(let k in upgDB) { if(game.autoBuyer.conf[k] === undefined) game.autoBuyer.conf[k] = { on: false, max: upgDB[k].mx }; }
         }
         
         function wipeSave() { if(confirm("HARD RESET? You will lose absolutely everything. Cannot be undone.")) { localStorage.clear(); location.reload(); } }
-        function toggleBetaUI() { game.settings.betaUI = !game.settings.betaUI; if(game.settings.betaUI) document.body.classList.add('beta-ui'); else document.body.classList.remove('beta-ui'); forceUI(); }
+        function toggleBetaUI() { game.settings.betaUI = !game.settings.betaUI; document.body.className = `theme-${game.shop.eqTheme}`; if(game.settings.betaUI) document.body.classList.add('beta-ui'); forceUI(); }
 
         // --- 4. FORMATTING & MATH HELPERS ---
         function fNum(n) { if(n >= 1e9) return (n/1e9).toFixed(2) + 'B'; if(n >= 1e6) return (n/1e6).toFixed(2) + 'M'; if(n >= 1e3) return (n/1e3).toFixed(1) + 'k'; return Math.floor(n); }
-        function notif(msg) { let el = document.createElement('div'); el.className = 'notif'; el.innerHTML = msg; document.getElementById('notif-area').appendChild(el); setTimeout(() => el.remove(), 3500); }
-        function fTxt(x, y, h) { let el = document.createElement('div'); el.className = 'float-txt'; el.innerHTML = h; el.style.left = (x - 20 + (Math.random()*40-20)) + 'px'; el.style.top = (y - 40) + 'px'; document.body.appendChild(el); setTimeout(() => el.remove(), 1000); }
+        function notif(msg, dur=3500) { 
+            let el = document.createElement('div'); el.className = 'notif'; el.innerHTML = msg; 
+            el.style.animation = `fadeUp ${dur/1000}s forwards`;
+            document.getElementById('notif-area').appendChild(el); 
+            setTimeout(() => el.remove(), dur); 
+        }
+        function fTxt(x, y, h) { 
+            if(document.getElementsByClassName('float-txt').length > 15) return; // Prevent lag
+            let el = document.createElement('div'); el.className = 'float-txt'; el.innerHTML = h; 
+            el.style.left = (x - 20 + (Math.random()*40-20)) + 'px'; el.style.top = (y - 40) + 'px'; 
+            document.body.appendChild(el); setTimeout(() => el.remove(), 1000); 
+        }
 
         function isGD() { return Date.now() < game.activeAbils.gdEnd; }
         function isRelicComplete() { return game.relics.every(x => x); }
@@ -783,6 +891,7 @@
             let baseMult = game.stat.mult * (isRelicComplete() ? 5 : 1); 
             if(game.normalReb > 0) baseMult *= normRebDB[game.normalReb-1].m; 
             if(game.shop.eqTheme === 'void' && game.pets.eq && game.pets.eq.n.toLowerCase().includes('void')) baseMult *= 5; 
+            baseMult *= (1.0 + (game.ach.length * 0.02)); // Achievements
             return baseMult;
         }
         
@@ -792,6 +901,9 @@
             if(game.shop.eqTheme === 'glitter') base += 3; 
             if(game.shop.eqTheme === 'gold') base += 25; 
             if(game.shop.eqTheme === 'void') base += 100;
+            if(game.shop.eqTheme === 'inferno') base += 250;
+            if(game.shop.eqTheme === 'plasma') base += 400;
+            if(game.shop.eqTheme === 'matrix') base += 250;
             if(game.shop.eqTheme === 'galactic') base += 500;
             if(game.pets.eq && game.pets.eq.p) base += game.pets.eq.p;
             
@@ -810,40 +922,55 @@
             if(game.shop.eqTheme === 'water') c += 0.02; 
             if(game.shop.eqTheme === 'gold') c += 0.05; 
             if(game.shop.eqTheme === 'void') c += 0.10;
+            if(game.shop.eqTheme === 'plasma') c += 0.20;
             if(game.shop.eqTheme === 'galactic') c += 0.25;
+            if(game.shop.arts.clover) c += 0.02;
             if(game.pets.eq && game.pets.eq.c) c += (game.pets.eq.c / 100); 
             if(isGD()) c *= gdLevels[game.skills.gd].cnM; 
             return c;
         }
 
-        function getGemC() { let g = game.base.gem; if(isGD()) g *= gdLevels[game.skills.gd].gM; return g; }
+        function getGemC() { let g = game.base.gem + (game.upg.gemFind * 0.0000001); if(isGD()) g *= gdLevels[game.skills.gd].gM; return g; }
         
         function getMatC() { 
             let m = game.base.mat + (game.upg.mat * 0.005); 
             if(game.normalReb > 0) m += normRebDB[game.normalReb-1].mb;
+            if(game.shop.eqTheme === 'cyber') m += 0.50;
+            if(game.shop.eqTheme === 'matrix') m += 1.00;
             if(game.shop.eqTheme === 'galactic') m += 0.10;
             if(isGD()) m *= gdLevels[game.skills.gd].mM; 
             return m; 
         }
 
         // --- 5. CORE MECHANICS & EVENTS ---
+        document.addEventListener('click', (e) => {
+            // Overcharge Penalty
+            if(game.anomaly.active && game.anomaly.type === 'overcharge' && combo > 0) {
+                if(!e.target.closest('.scene') && !e.target.closest('.tab-btn')) {
+                    combo = 0; notif("💥 Missed! Combo Reset to 0!"); forceUI();
+                }
+            }
+        });
+
         function clickCore(e) {
             let now = Date.now(); 
             if(now - lastManClick < 100) return; 
             game.stat.manualClicks++;
             
-            if(game.corrupt.active) {
-                game.corrupt.clicks++; fTxt(e.clientX, e.clientY, `<span style="color:#ef4444; font-weight:bold; font-size:24px;">HIT!</span>`); playSnd('click');
-                document.getElementById('crpt-clicks').innerText = game.corrupt.clicks;
-                if(game.corrupt.clicks >= 100) { 
-                    game.corrupt.active = false; game.stat.cClear++; playSnd('gem'); 
-                    game.curr.gems += 5; game.mats.void += 1; 
-                    document.getElementById('main-scene').classList.remove('corrupted'); document.getElementById('corrupt-ui').style.display = 'none'; 
-                    let msg = "✨ PURIFIED! +5 Gems, +1 Void! ✨";
-                    if(Math.random() < 0.25) { game.pets.inv.push({ id: Date.now()+1, n: "Corrupted Soul", r: "Corrupted", s: 0, p: 5000, c: -50 }); msg += " 👿 Got Corrupted Soul Pet!"; }
-                    notif(msg); 
+            if(game.anomaly.active) {
+                if(game.anomaly.type === 'frozen') {
+                    game.anomaly.clicks++;
+                    fTxt(e.clientX, e.clientY, `<span style="color:#7dd3fc; font-weight:bold; font-size:24px;">ICE!</span>`); playSnd('click');
+                    if(game.anomaly.clicks >= 50) {
+                        game.anomaly.active = false; document.getElementById('main-scene').classList.remove('frozen'); document.getElementById('anomaly-ui').style.display = 'none';
+                        let s = Math.floor(Math.random()*50)+50; let d = Math.floor(Math.random()*15)+5; let sh = Math.floor(Math.random()*5)+1;
+                        game.mats.scrap += s; game.mats.dust += d; game.mats.shard += sh;
+                        let msg = `❄️ ICE SHATTERED! +${s} Scr, +${d} Dst, +${sh} Shd!`;
+                        if(Math.random() < 0.01) { game.curr.gems++; msg += " +1 GEM!"; }
+                        notif(msg); playSnd('gem'); forceUI();
+                    }
+                    return;
                 }
-                return;
             }
 
             let mxC = 100 + (game.forgeUpg.combo * 100);
@@ -856,20 +983,25 @@
             document.getElementById('combo-num').innerText = combo > 4 ? `${combo}x Combo!` : '';
             document.getElementById('combo-mult-txt').innerText = combo > 0 ? `(${(1.0 + combo*0.01).toFixed(2)}x)` : '';
             
-            // Galactic Stone Chance
-            if(game.galac.active && Math.random() < 0.001) {
-                game.mats.gStone++; playSnd('gem'); fTxt(e.clientX, e.clientY-30, `<span style="color:#d946ef; font-size:24px; font-weight:bold;">+1 Galactic Stone!</span>`);
-            }
+            if(game.galac.active && Math.random() < 0.001) { game.mats.gStone++; playSnd('gem'); fTxt(e.clientX, e.clientY-30, `<span style="color:#d946ef; font-size:24px; font-weight:bold;">+1 Galactic Stone!</span>`); }
 
-            triggerClick(e.clientX, e.clientY, true); playSnd('click');
+            let isOver = game.anomaly.active && game.anomaly.type === 'overcharge';
+            triggerClick(e.clientX, e.clientY, true, isOver ? 3 : 1); playSnd('click');
         }
 
-        function triggerClick(x, y, isManual) {
-            let clicks = getPwr(); game.curr.clicks += clicks; game.stat.tClicks += clicks; progBounty('clicks', clicks);
+        function triggerClick(x, y, isManual, forcedMult = 1) {
+            let clicks = getPwr() * forcedMult;
+            
+            if(isManual && Math.random() < game.upg.crit * 0.01) {
+                clicks *= 5; fTxt(x, Math.max(0, y-20), `<span style="color:#ef4444; font-weight:900; font-size:22px; text-shadow:0 0 5px red;">CRIT!</span>`);
+            }
+            
+            game.curr.clicks += clicks; game.stat.tClicks += clicks; progBounty('clicks', clicks);
             let html = `<span class="color-clicks">+${clicks}</span>`;
 
+            // Note: TCM strictly does NOT apply to coin drops now. 
             if(Math.random() < getCoinC()) { 
-                let coinGain = 1 * getMult(); game.curr.coins += coinGain; progBounty('coins', coinGain);
+                let coinGain = 1; game.curr.coins += coinGain; progBounty('coins', coinGain);
                 html += `<br><span class="color-coins">+${coinGain} Coin</span>`; if(isManual) playSnd('coin'); 
             }
             if(Math.random() < 0.005) { game.curr.coins += 2; progBounty('coins', 2); html += `<br><span class="color-coins">+2 Coins!</span>`; } 
@@ -884,14 +1016,62 @@
                 else if(r < 0.15) { game.mats.dust++; html += `<br><span class="color-mat">Dust!</span>`; } 
                 else { game.mats.scrap++; html += `<br><span class="color-mat">Scrap</span>`; }
             }
-            if(isManual && x && y) fTxt(x, y, html); forceUI();
+            if(isManual && x && y) fTxt(x, y, html); checkAch(); forceUI();
         }
 
-        function triggerCorruption() {
-            if(game.corrupt.active || game.galac.active) return;
-            game.corrupt.active = true; game.corrupt.clicks = 0; game.corrupt.end = Date.now() + 15000;
-            document.getElementById('main-scene').classList.add('corrupted'); document.getElementById('corrupt-ui').style.display = 'block';
-            document.getElementById('crpt-clicks').innerText = 0; playSnd('boss'); notif("🚨 WARNING: CORE CORRUPTION! 🚨");
+        function triggerAnomaly() {
+            if(game.anomaly.active || game.galac.active) return;
+            let r = Math.random();
+            game.anomaly.active = true;
+            
+            if(r < 0.45) {
+                // Frozen Core
+                game.anomaly.type = 'frozen'; game.anomaly.clicks = 0; game.anomaly.end = Date.now() + 5000;
+                document.getElementById('main-scene').classList.add('frozen');
+                document.getElementById('ano-title').innerText = "FROZEN CORE";
+                document.getElementById('ano-desc').innerText = "Shatter it! 50 clicks in 5s!";
+                document.getElementById('anomaly-ui').style.display = 'block';
+                notif("❄️ The Core is Frozen!"); playSnd('magic');
+            } else if(r < 0.55) {
+                // Overcharge
+                game.anomaly.type = 'overcharge'; game.anomaly.end = Date.now() + 10000;
+                document.getElementById('main-scene').classList.add('overcharge');
+                document.getElementById('ano-title').innerText = "OVERCHARGE";
+                document.getElementById('ano-desc').innerText = "3x Clicks! Don't miss the core!";
+                document.getElementById('anomaly-ui').style.display = 'block';
+                notif("⚡ Core Overcharged!"); playSnd('magic');
+            } else {
+                // Meteor Shower
+                game.anomaly.type = 'meteor'; game.anomaly.end = Date.now() + 5000;
+                document.getElementById('ano-title').innerText = "METEOR SHOWER";
+                document.getElementById('ano-desc').innerText = "Catch the meteors!";
+                document.getElementById('anomaly-ui').style.display = 'block';
+                notif("☄️ Meteor Shower Incoming!"); playSnd('magic');
+                
+                let mc = document.getElementById('meteor-container');
+                for(let i=0; i<10; i++) {
+                    setTimeout(() => {
+                        if(!game.anomaly.active || game.anomaly.type !== 'meteor') return;
+                        let m = document.createElement('div'); m.className = 'meteor'; m.innerHTML = "☄️";
+                        m.style.left = Math.random() * 80 + 10 + '%'; m.style.top = '-50px';
+                        m.style.setProperty('--endX', (Math.random() * 200 - 100) + 'px');
+                        m.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+                        
+                        m.onmouseover = m.onclick = () => {
+                            m.remove(); playSnd('coin');
+                            let sc = Math.floor(Math.random()*10)+5; game.mats.scrap += sc;
+                            let dustGot = Math.random() < 0.1; if(dustGot) game.mats.dust++;
+                            let html = `<span style="color:#a78bfa; font-size:12px;">+${sc} Scrap</span>`;
+                            if(dustGot) { html += `<br><span style="color:#a78bfa; font-size:12px;">+1 Dust</span>`; }
+                            notif(`☄️ Caught Meteor! +${sc} Scrap` + (dustGot ? " & +1 Dust!" : ""));
+                            fTxt(m.getBoundingClientRect().left, m.getBoundingClientRect().top, html);
+                            forceUI();
+                        };
+                        mc.appendChild(m);
+                        setTimeout(() => { if(m.parentNode) m.remove(); }, 3000);
+                    }, i * 400);
+                }
+            }
         }
 
         function trgCore() {
@@ -918,7 +1098,7 @@
                 
                 if(isEpic) { let scrapWon = 2; game.mats.scrap += scrapWon; matStr = ` | +${scrapWon} Scrap`; } 
                 else {
-                    coinsWon = Math.floor(Math.random() * (coinRange[1] - coinRange[0] + 1) + coinRange[0]) * getMult(); 
+                    coinsWon = Math.floor(Math.random() * (coinRange[1] - coinRange[0] + 1) + coinRange[0]); // Raw coins 
                     game.curr.coins += coinsWon; progBounty('coins', coinsWon);
                     if(Math.random() < gemChance) { game.curr.gems++; gemStr = " | +1 GEM!"; }
                     
@@ -941,10 +1121,10 @@
             };
         }
 
-        // --- 6. MINIGAME ---
+        // --- 6. MINIGAMES ---
         function buildMineGrid() {
             let mg = document.getElementById('mine-grid'); mg.innerHTML = '';
-            for(let i=0; i<25; i++) {
+            for(let i=0; i<16; i++) {
                 let tile = document.createElement('div'); tile.className = 'mine-tile';
                 let front = document.createElement('div'); front.className = 'tile-front'; let back = document.createElement('div'); back.className = 'tile-back';
                 tile.appendChild(front); tile.appendChild(back);
@@ -956,14 +1136,14 @@
                         let lootMult = 1.0 + (game.mineUpg.loot * 0.2); 
                         let baseCoins = Math.floor(2 * lootMult); game.mine.loot.coin += baseCoins; htmlText = `${baseCoins}<br>Coins`;
                         
-                        if(r < 0.01) { cssClass = 'r-leg'; let gC = Math.floor(55 * lootMult); htmlText = `${gC} Coins<br>1 Void<br>1 Gem`; game.mine.loot.coin += gC - baseCoins; game.mine.loot.void++; game.mine.loot.gem++; playSnd('gem'); } 
-                        else if(r < 0.06) { cssClass = 'r-epic'; let eC = Math.floor(18 * lootMult); htmlText = `${eC} Coins<br>1 Dust<br>1 Shard`; game.mine.loot.coin += eC - baseCoins; game.mine.loot.dust++; game.mine.loot.shard++; playSnd('coin'); } 
+                        if(r < 0.01) { cssClass = 'r-leg'; let gC = Math.floor(55 * lootMult); htmlText = `${gC} Coins<br>1 Void<br>1 Gem`; game.mine.loot.coin += gC - baseCoins; game.mine.loot.void++; game.mine.loot.gem++; playSnd('gem'); game.stat.legCores++; } 
+                        else if(r < 0.06) { cssClass = 'r-epic'; let eC = Math.floor(18 * lootMult); htmlText = `${eC} Coins<br>1 Dust<br>1 Shard`; game.mine.loot.coin += eC - baseCoins; game.mine.loot.dust++; game.mine.loot.shard++; playSnd('coin'); game.stat.epicCores++; } 
                         else if(r < 0.21) { cssClass = 'r-rare'; let rC = Math.floor(6 * lootMult); htmlText = `${rC} Coins<br>1 Scrap`; game.mine.loot.coin += rC - baseCoins; game.mine.loot.scrap++; }
                         
                         back.classList.add(cssClass); back.innerHTML = htmlText; tile.classList.add('flipped');
                         
                         if(game.mine.picks <= 0) setTimeout(() => {
-                            game.mine.active = false; game.stat.mgPlayed = (game.stat.mgPlayed || 0) + 1;
+                            game.mine.active = false; game.stat.mgPlayed = (game.stat.mgPlayed || 0) + 1; checkAch();
                             let cdMins = 10 - game.mineUpg.cd - (game.skills.ts > 0 ? 3 : 0); game.mine.cd = Date.now() + (cdMins * 60000);
                             game.curr.coins += game.mine.loot.coin; game.curr.gems += game.mine.loot.gem; progBounty('coins', game.mine.loot.coin);
                             game.mats.scrap += game.mine.loot.scrap; game.mats.dust += game.mine.loot.dust; game.mats.shard += game.mine.loot.shard; game.mats.void += game.mine.loot.void;
@@ -979,7 +1159,7 @@
         
         function startMine() {
             if(game.mine.cd > Date.now() || game.curr.coins < 20) return;
-            game.curr.coins -= 20; game.mine.active = true; game.mine.picks = 5 + (game.equipEq.pick ? 2 : 0);
+            game.curr.coins -= 20; game.mine.active = true; game.mine.picks = 4 + (game.equipInv.pick && game.equipEq.pick ? 2 : 0) + (game.shop.arts.scanner ? 2 : 0);
             game.mine.loot = {coin: 0, scrap: 0, dust: 0, shard: 0, void: 0, gem: 0}; progBounty('mine', 1);
             buildMineGrid(); forceUI();
         }
@@ -990,6 +1170,49 @@
             if(game.curr.coins >= cc && game.curr.clicks >= clc && game.mats.scrap >= sc && game.mats.dust >= dc) {
                 game.curr.coins -= cc; game.curr.clicks -= clc; game.mats.scrap -= sc; game.mats.dust -= dc; game.mineUpg[k]++; forceUI();
             }
+        }
+
+        function hackLoop() {
+            if(!game.hack.active) return;
+            game.hack.pos += 0.8 * game.hack.dir;
+            if(game.hack.pos > 96 || game.hack.pos < 0) game.hack.dir *= -1;
+            document.getElementById('hack-cursor').style.left = game.hack.pos + '%';
+            game.hack.frame = requestAnimationFrame(hackLoop);
+        }
+
+        function startHack() {
+            if(game.curr.coins < 50 || game.hack.active || game.hack.cd > Date.now()) return;
+            game.curr.coins -= 50; game.hack.active = true; game.hack.tries = 3; game.hack.succ = 0; game.hack.pos = 0; game.hack.dir = 1;
+            document.getElementById('btn-start-hack').style.display = 'none'; document.getElementById('btn-do-hack').style.display = 'block'; document.getElementById('hack-res').style.display = 'none';
+            hackLoop(); forceUI();
+        }
+
+        function hitHack() {
+            if(!game.hack.active) return;
+            let success = game.hack.pos >= 35 && game.hack.pos <= 65;
+            if(success) { game.hack.succ++; playSnd('coin'); } else { playSnd('boss'); }
+            game.hack.tries--;
+            
+            if(game.hack.tries <= 0) {
+                game.hack.active = false; cancelAnimationFrame(game.hack.frame);
+                game.hack.cd = Date.now() + 300000; // 5 min CD
+                game.stat.mgPlayed = (game.stat.mgPlayed || 0) + 1; checkAch();
+
+                document.getElementById('btn-do-hack').style.display = 'none';
+                
+                let el = document.getElementById('hack-res'); el.style.display = 'block';
+                if(game.hack.succ === 3) {
+                    let gw = Math.random() < 0.05 ? 1 : 0; let cw = 200; // Removed getMult for raw coins
+                    game.curr.coins += cw; game.curr.gems += gw;
+                    el.innerText = `PERFECT HACK! +${fNum(cw)} Coins` + (gw ? " & +1 GEM!" : "!"); el.style.color = "#4ade80";
+                } else if(game.hack.succ > 0) {
+                    let cw = (50 * game.hack.succ); game.curr.coins += cw;
+                    el.innerText = `Hack complete. +${fNum(cw)} Coins.`; el.style.color = "#fbbf24";
+                } else {
+                    el.innerText = `Hack failed. You got caught.`; el.style.color = "#ef4444";
+                }
+            }
+            forceUI();
         }
 
         // --- 7. CRAFTING, PETS & FORGE ---
@@ -1070,18 +1293,31 @@
         function tglEq(k) { if(game.equipInv[k]) { game.equipEq[k] = !game.equipEq[k]; forceUI(); } }
 
         // --- 8. SHOP, MARKET, & TRADES ---
+        function unlockAutoBuyer() {
+            if(game.curr.coins >= 10000 && !game.autoBuyer.unlocked) { game.curr.coins -= 10000; game.autoBuyer.unlocked = true; forceUI(); }
+        }
+        function toggleAB(k) { game.autoBuyer.conf[k].on = !game.autoBuyer.conf[k].on; forceUI(); }
+        function setABMax(k, v) { let val = parseInt(v); if(!isNaN(val)) game.autoBuyer.conf[k].max = Math.min(Math.max(val, 0), upgDB[k].mx); forceUI(); }
+
         function buyShopItem(i) {
             if(i === 'auto' && !game.shop.auto && game.curr.coins >= 75) { game.curr.coins -= 75; game.shop.auto = true; game.upg.auto = 1; }
             if(i === 'gold' && !game.shop.goldAuto && game.curr.gems >= 1) { game.curr.gems -= 1; game.shop.goldAuto = true; }
             forceUI();
         }
-        function buyUpg(k) { 
+        function buyUpg(k, silent=false) { 
             let u = upgDB[k]; let c = u.cArr ? u.cArr[game.upg[k]] : Math.floor(u.c * Math.pow(u.m, game.upg[k])); 
-            if(game.curr[u.cType] >= c) { game.curr[u.cType] -= c; game.upg[k]++; forceUI(); } 
+            if(game.curr[u.cType] >= c && game.upg[k] < u.mx) { game.curr[u.cType] -= c; game.upg[k]++; if(!silent) forceUI(); return true;} 
+            return false;
         }
-        function buyArt(id) { let c = id === 'time' ? 2 : 5; if(!game.shop.arts[id] && game.curr.gems >= c) { game.curr.gems -= c; game.shop.arts[id] = true; forceUI(); } }
+        function buyArt(id) { 
+            if(id==='time' && !game.shop.arts.time && game.curr.gems>=2) { game.curr.gems-=2; game.shop.arts.time=true; forceUI(); }
+            if(id==='magnet' && !game.shop.arts.magnet && game.curr.gems>=5) { game.curr.gems-=5; game.shop.arts.magnet=true; forceUI(); }
+            if(id==='clover' && !game.shop.arts.clover && game.curr.coins>=30000 && game.mats.scrap>=500 && game.mats.dust>=100) { game.curr.coins-=30000; game.mats.scrap-=500; game.mats.dust-=100; game.shop.arts.clover=true; forceUI(); }
+            if(id==='battery' && !game.shop.arts.battery && game.curr.coins>=150000 && game.mats.scrap>=2000 && game.mats.dust>=250 && game.mats.shard>=10) { game.curr.coins-=150000; game.mats.scrap-=2000; game.mats.dust-=250; game.mats.shard-=10; game.shop.arts.battery=true; forceUI(); }
+            if(id==='scanner' && !game.shop.arts.scanner && game.curr.coins>=800000 && game.mats.scrap>=10000 && game.mats.void>=2) { game.curr.coins-=800000; game.mats.scrap-=10000; game.mats.void-=2; game.shop.arts.scanner=true; forceUI(); }
+        }
         function buyTh(id) { let t = themeDB[id]; if(!game.shop.themes.includes(id) && game.curr[t.cType] >= t.c && (!t.reqMat || game.mats[t.reqMat] >= t.mCost)) { game.curr[t.cType] -= t.c; if(t.reqMat) game.mats[t.reqMat] -= t.mCost; game.shop.themes.push(id); forceUI(); } }
-        function eqTh(id) { if(game.shop.themes.includes(id)) { game.shop.eqTheme = id; document.body.className = `theme-${id}`; if(game.settings.betaUI) document.body.classList.add('beta-ui'); forceUI(); } }
+        function eqTh(id) { if(game.shop.themes.includes(id) || id === 'default') { game.shop.eqTheme = id; document.body.className = `theme-${id}`; if(game.settings.betaUI) document.body.classList.add('beta-ui'); forceUI(); } }
         
         function genBMDeals() {
             game.market.bmDeals = [];
@@ -1100,6 +1336,17 @@
         }
         
         // --- 9. NEW MECHANICS & GALACTIC EVENT ---
+        function checkAch() {
+            let newlyUnlocked = false;
+            achDB.forEach(a => {
+                if(!game.ach.includes(a.id) && a.c()) {
+                    game.ach.push(a.id);
+                    notif(`🏆 Trophy Unlocked: ${a.n}! +2% TCM`); newlyUnlocked = true; playSnd('gem');
+                }
+            });
+            if(newlyUnlocked) forceUI();
+        }
+
         function genBounty() { let b = bountiesDB[Math.floor(Math.random()*bountiesDB.length)]; game.bounty = { t: b.t, c: 0, m: b.m, r: b.r, txt: b.txt }; forceUI(); }
         function claimBounty() { if(game.bounty && game.bounty.c >= game.bounty.m) { game.curr.gems += game.bounty.r; playSnd('gem'); genBounty(); } }
         function progBounty(t, amt) { if(game.bounty && game.bounty.t === t) { game.bounty.c += amt; } }
@@ -1107,12 +1354,13 @@
         function doEvolution() {
             if(game.normalReb >= 10) return;
             let nr = normRebDB[game.normalReb];
-            if(game.curr.clicks >= nr.req) { game.curr.clicks -= nr.req; game.normalReb++; notif(`🌟 Evolution Tier ${game.normalReb} Reached! Permanent buffs added!`); forceUI(); }
+            if(game.curr.clicks >= nr.req) { game.curr.clicks -= nr.req; game.normalReb++; notif(`🌟 Evolution Tier ${game.normalReb} Reached! Permanent buffs added!`); checkAch(); forceUI(); }
         }
 
         function claimQuest(cat) {
             let q = questDB[cat]; let s = game.quest[cat].s;
-            if(s < q.reqs.length && q.c() >= q.reqs[s]) {
+            let req = q.reqs[s] * Math.pow(1.5, game.stat.rebirths);
+            if(s < q.reqs.length && q.c() >= req) {
                 if(q.isGem[s]) game.curr.gems += q.r[s]; else game.curr.coins += q.r[s];
                 game.quest[cat].s++; playSnd('gem'); forceUI();
             }
@@ -1144,7 +1392,7 @@
             }
 
             game.mats.scrap += scr; game.mats.dust += dst; game.mats.shard += sh; game.mats.void += voi; game.curr.coins += coin;
-            notif(msg); forceUI();
+            notif(msg, 10000); forceUI();
         }
 
         function toggleGalacChances() { let e = document.getElementById('galac-chances'); e.style.display = e.style.display === 'none' ? 'block' : 'none'; }
@@ -1156,10 +1404,10 @@
             if(game.curr.coins >= q.c && game.mats.void >= q.v && game.upg.auto >= q.a) {
                 if(confirm("Wipe for x" + q.m + " TCM & +" + (r+1) + " Cosmic Points?")) {
                     game.curr.clicks = 0; game.curr.coins = 0; game.mats.scrap = 0; game.mats.dust = 0; game.mats.shard = 0; game.mats.void -= q.v;
-                    for(let k in game.upg) game.upg[k] = 0; 
+                    for(let k in game.upg) { game.upg[k] = 0; if(game.autoBuyer.conf[k]) game.autoBuyer.conf[k].on = false; } 
                     game.quest = { time: {s:0}, clicks: {s:0}, mine: {s:0}, mats: {s:0} };
                     game.stat.mult = q.m; game.stat.rebirths++; game.curr.cp += (r+1);
-                    notif("🌌 COSMIC REBIRTH SUCCESSFUL 🌌"); forceUI();
+                    checkAch(); notif("🌌 COSMIC REBIRTH SUCCESSFUL 🌌"); forceUI();
                 }
             }
         }
@@ -1203,9 +1451,9 @@
             document.getElementById('v-gem').innerText = fNum(game.curr.gems); document.getElementById('v-rebirth').innerText = game.stat.rebirths + '/5';
             document.getElementById('v-pwr').innerText = fNum(getPwr()); document.getElementById('v-mult').innerText = 'x' + getMult().toFixed(2); 
             document.getElementById('v-chance').innerText = (getCoinC() * 100).toFixed(1) + '%'; 
-            document.getElementById('v-gemc').innerText = (getGemC() * 100).toFixed(6) + '%'; document.getElementById('v-matc').innerText = (getMatC() * 100).toFixed(1) + '%';
+            document.getElementById('v-gemc').innerText = (getGemC() * 100).toFixed(4) + '%'; document.getElementById('v-matc').innerText = (getMatC() * 100).toFixed(1) + '%';
             
-            let spd = game.upg.auto * getMult(); if(game.shop.goldAuto) spd *= 2; document.getElementById('v-cps').innerText = Math.floor(spd);
+            let spd = game.upg.auto * getMult(); if(game.shop.goldAuto) spd *= 2; if(game.shop.arts.battery) spd *= 1.5; document.getElementById('v-cps').innerText = Math.floor(spd);
             document.getElementById('v-pet').innerHTML = game.pets.eq ? `${game.pets.eq.n} ${"⭐".repeat(game.pets.eq.s)} <br> (+${game.pets.eq.p} Pwr, ${game.pets.eq.c > 0 ? '+'+game.pets.eq.c : game.pets.eq.c}%)` : 'None';
             let eqArr = []; if(game.equipEq.pick) eqArr.push("Pick"); if(game.equipEq.aura) eqArr.push("Aura"); document.getElementById('v-equip').innerText = eqArr.length > 0 ? eqArr.join(', ') : "None";
             document.getElementById('v-max-combo').innerText = 100 + (game.forgeUpg.combo * 100);
@@ -1214,13 +1462,13 @@
 
             let abHTML = ""; 
             if(game.skills.gd > 0) {
-                if(isGD()) abHTML += `<div style="color:#fde047;">Dice: ${Math.ceil((game.activeAbils.gdEnd-Date.now())/1000)}s</div>`;
-                else if(game.timers.gd > Date.now()) abHTML += `<div style="color:#ef4444;">Dice CD: ${Math.ceil((game.timers.gd-Date.now())/1000)}s</div>`;
-                else abHTML += `<button class="btn-act" onclick="actGD()" style="background:#fde047;margin:0 0 5px 0;padding:4px;">Roll Dice</button>`;
+                if(isGD()) abHTML += `<div style="color:#fde047; margin-bottom:5px; font-weight:bold;">Dice: ${Math.ceil((game.activeAbils.gdEnd-Date.now())/1000)}s</div>`;
+                else if(game.timers.gd > Date.now()) abHTML += `<div style="color:#ef4444; margin-bottom:5px; font-weight:bold;">Dice CD: ${Math.ceil((game.timers.gd-Date.now())/1000)}s</div>`;
+                else abHTML += `<button class="btn-ability" onclick="actGD()">🎲 Roll Dice</button>`;
             }
             if(game.skills.ts > 0) {
-                if(game.timers.ts > Date.now()) abHTML += `<div style="color:#ef4444;">Time CD: ${Math.ceil((game.timers.ts-Date.now())/1000)}s</div>`;
-                else abHTML += `<button class="btn-act" onclick="actTS()" style="background:#e9d5ff;margin:0 0 5px 0;padding:4px;">Timeskip</button>`;
+                if(game.timers.ts > Date.now()) abHTML += `<div style="color:#ef4444; margin-top:5px; font-weight:bold;">Time CD: ${Math.ceil((game.timers.ts-Date.now())/1000)}s</div>`;
+                else abHTML += `<button class="btn-ability btn-ability-ts" onclick="actTS()">⏳ Timeskip</button>`;
             }
             document.getElementById('v-abilities').innerHTML = abHTML || "None";
 
@@ -1228,7 +1476,7 @@
             document.getElementById('i-shard').innerText = fNum(game.mats.shard); document.getElementById('i-void').innerText = fNum(game.mats.void); 
             document.getElementById('i-dm').innerText = game.curr.dm; document.getElementById('i-galac').innerText = fNum(game.mats.gStone);
             
-            let ec = document.getElementById('c-eggs'); ec.innerHTML = ''; game.pets.eggs.forEach((e, i) => { ec.innerHTML += `<div class="card" style="display:inline-block;width:45%;margin-right:2%;cursor:pointer;" onclick="openEgg(${i})"><h4 style="justify-content:center;">🥚 ${e}</h4><p style="text-align:center;">Open</p></div>`; });
+            let ec = document.getElementById('c-eggs'); ec.innerHTML = ''; game.pets.eggs.forEach((e, i) => { ec.innerHTML += `<div class="card egg-${e}" style="display:inline-block;width:45%;margin-right:2%;cursor:pointer;" onclick="openEgg(${i})"><h4 style="justify-content:center;">🥚 ${e}</h4><p style="text-align:center;">Open</p></div>`; });
             
             let pc = document.getElementById('c-pets'); pc.innerHTML = ''; 
             game.pets.inv.forEach(p => { 
@@ -1259,7 +1507,22 @@
             let ic = document.getElementById('c-inv-themes'); ic.innerHTML = '';
             game.shop.themes.forEach(k => { let t = themeDB[k]; let eq = game.shop.eqTheme === k; ic.innerHTML += `<div class="card" style="${t.css}"><h4>${t.n}</h4><p>${t.b}</p><button class="btn-act" onclick="eqTh('${k}')" ${eq ? 'disabled' : ''}>${eq ? 'Equipped' : 'Equip'}</button></div>`; });
 
-            // Upgrades
+            // Upgrades & Autobuyers
+            if(game.autoBuyer.unlocked) {
+                document.getElementById('c-autobuy-lock').style.display = 'none'; document.getElementById('c-autobuy-ui').style.display = 'block';
+                let abHTML = "";
+                for(let k in upgDB) {
+                    if(k === 'auto' && !game.shop.auto) continue;
+                    let u = upgDB[k]; let cnf = game.autoBuyer.conf[k];
+                    abHTML += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.5); padding:5px; margin-bottom:2px; border-radius:4px;">
+                        <div style="font-size:11px; width:40%;">${u.n}</div>
+                        <div><input type="number" value="${cnf.max}" onchange="setABMax('${k}', this.value)" style="width:40px; background:rgba(255,255,255,0.1); color:white; border:none; padding:2px; font-size:10px;"></div>
+                        <button class="btn-act" style="width:50px; margin:0; padding:4px; font-size:10px; background:${cnf.on?'#4ade80':'#ef4444'}" onclick="toggleAB('${k}')">${cnf.on?'ON':'OFF'}</button>
+                    </div>`;
+                }
+                document.getElementById('c-ab-list').innerHTML = abHTML;
+            }
+
             let uc = document.getElementById('c-upg'); let catsObj = {}; 
             for(let k in upgDB) { if(k === 'auto' && !game.shop.auto) continue; let c = upgDB[k].cat; if(!catsObj[c]) catsObj[c] = []; catsObj[c].push(k); }
             let upgHTML = "";
@@ -1302,22 +1565,25 @@
             let bGA = document.getElementById('b-shop-gold'); bGA.innerText = game.shop.goldAuto ? "Owned" : "Buy: 1 Gem"; bGA.disabled = game.shop.goldAuto || game.curr.gems < 1; 
             let bAT = document.getElementById('b-art-time'); bAT.innerText = game.shop.arts.time ? "Owned" : "Buy: 2 Gems"; bAT.disabled = game.shop.arts.time || game.curr.gems < 2; 
             let bAM = document.getElementById('b-art-mag'); bAM.innerText = game.shop.arts.magnet ? "Owned" : "Buy: 5 Gems"; bAM.disabled = game.shop.arts.magnet || game.curr.gems < 5;
+            let bAC = document.getElementById('b-art-clov'); bAC.innerText = game.shop.arts.clover ? "Owned" : "Buy: 30k Cns, 500 Scr, 100 Dst"; bAC.disabled = game.shop.arts.clover || game.curr.coins < 30000 || game.mats.scrap < 500 || game.mats.dust < 100;
+            let bAB = document.getElementById('b-art-batt'); bAB.innerText = game.shop.arts.battery ? "Owned" : "Buy: 150k Cns, 2k Scr, 10 Shd"; bAB.disabled = game.shop.arts.battery || game.curr.coins < 150000 || game.mats.scrap < 2000 || game.mats.dust < 250 || game.mats.shard < 10;
+            let bAS = document.getElementById('b-art-scan'); bAS.innerText = game.shop.arts.scanner ? "Owned" : "Buy: 800k Cns, 10k Scr, 2 Vd"; bAS.disabled = game.shop.arts.scanner || game.curr.coins < 800000 || game.mats.scrap < 10000 || game.mats.void < 2;
+            
             let tCont = document.getElementById('c-themes'); tCont.innerHTML = '';
             for(let k in themeDB) { let t = themeDB[k]; if(game.shop.themes.includes(k) || k === 'galactic') continue; let rStr = t.reqMat ? `+ ${t.mCost} ${t.reqMat}` : ''; let canAfford = game.curr[t.cType] >= t.c && (!t.reqMat || game.mats[t.reqMat] >= t.mCost); tCont.innerHTML += `<div class="card" style="${t.css}"><h4>${t.n}</h4><p>Boost: ${t.b}</p><p style="margin-top:4px;">Cost: ${t.c} ${t.cType} ${rStr}</p><button class="btn-act" ${!canAfford ? 'disabled' : ''} onclick="buyTh('${k}')">Craft</button></div>`; }
 
             // Galactic Event UI
             if(game.galac.active) {
                 document.getElementById('ge-timer-txt').innerText = `EVENT ACTIVE! Ends in ${Math.ceil((game.galac.end - Date.now())/1000)}s`;
-                document.body.classList.add('galactic-active');
             } else {
                 let sL = Math.max(0, Math.floor((game.galac.next - Date.now())/1000));
                 document.getElementById('ge-timer-txt').innerText = `Next Event in: ${Math.floor(sL/60)}m ${sL%60}s`;
-                document.body.classList.remove('galactic-active');
             }
+            document.getElementById('ge-stone-count').innerText = fNum(game.mats.gStone);
             document.getElementById('ge-pots').innerText = game.galac.potsBought;
             let btnPot = document.getElementById('btn-buy-pot');
             btnPot.disabled = !game.galac.active || game.mats.gStone < 1 || game.galac.potsBought >= 10;
-            btnPot.innerText = game.galac.potsBought >= 10 ? "MAX BOUGHT" : "Brew (Cost: 1 Stone)";
+            btnPot.innerText = !game.galac.active ? "Wait for Event!" : (game.galac.potsBought >= 10 ? "MAX BOUGHT" : "Brew (Cost: 1 Stone)");
 
             // Quests
             if(game.bounty) {
@@ -1330,55 +1596,57 @@
             }
             let qCont = document.getElementById('c-quest'); let qHTML = "";
             for(let k in questDB) {
-                let q = questDB[k]; let s = game.quest[k].s; let mx = s >= q.reqs.length; let req = mx ? q.reqs[s-1] : q.reqs[s]; let p = q.c(); let pc = Math.min((p/req)*100, 100);
+                let q = questDB[k]; let s = game.quest[k].s; let mx = s >= q.reqs.length; let req = mx ? q.reqs[s-1] : q.reqs[s]; 
+                req = req * Math.pow(1.5, game.stat.rebirths);
+                let p = q.c(); let pc = Math.min((p/req)*100, 100);
                 let rTxt = mx ? "Claimed" : (q.isGem[s] ? q.r[s]+' Gem' : q.r[s]+' Coins');
                 let claimBtn = ""; if(!mx && p >= req) claimBtn = `<button class="btn-act" style="margin-top:5px; padding:4px;" onclick="claimQuest('${k}')">Claim!</button>`;
                 qHTML += `<div class="card"><h4>${q.n} <span class="badge">${mx ? 'MAX' : `Stage ${s+1}/5`}</span></h4><p>${q.d}</p><p style="font-size:10px; color:#38bdf8;">Reward: ${rTxt}</p><div class="combo-bar-bg"><div id="combo-fill" style="width:${pc}%; background:var(--coin-color);"></div></div><p style="text-align:right; margin:2px 0 0; font-size:10px">${fNum(Math.floor(p))}/${fNum(req)}</p>${claimBtn}</div>`;
             }
             qCont.innerHTML = qHTML;
 
-            // Mining
-            let muHTML = "";
-            for(let k in mineUpgDB) {
-                let u = mineUpgDB[k]; let l = game.mineUpg[k]; let mx = l >= u.mx;
-                let cc = Math.floor((u.req.coins||0) * Math.pow(u.m, l)); let clc = Math.floor((u.req.clicks||0) * Math.pow(u.m, l)); let sc = Math.floor((u.req.scrap||0) * Math.pow(u.m, l)); let dc = Math.floor((u.req.dust||0) * Math.pow(u.m, l));
-                let cStr = []; if(cc) cStr.push(fNum(cc) + " Cns"); if(clc) cStr.push(fNum(clc) + " Clks"); if(sc) cStr.push(sc + " Scr"); if(dc) cStr.push(dc + " Dst");
-                let canAfford = game.curr.coins >= cc && game.curr.clicks >= clc && game.mats.scrap >= sc && game.mats.dust >= dc;
-                muHTML += `<div class="card"><h4>${u.n} <span class="badge">Lvl ${l}/${u.mx}</span></h4><p>${u.d}</p><p style="font-size:10px;">Cost: ${cStr.join(', ')}</p><button class="btn-act" onclick="buyMineUpg('${k}')" ${mx || !canAfford ? 'disabled' : ''}>${mx ? 'MAX' : 'Upgrade'}</button></div>`;
+            // Trophies
+            document.getElementById('ach-bonus-txt').innerText = `+${game.ach.length * 2}%`;
+            let achHTML = "";
+            achDB.forEach(a => {
+                let unl = game.ach.includes(a.id);
+                achHTML += `<div class="card" style="border-left-color:${unl ? '#fbbf24' : '#475569'}; opacity:${unl ? 1 : 0.5};">
+                    <h4>${unl ? '🏆' : '🔒'} ${a.n}</h4><p>${a.d}</p>
+                </div>`;
+            });
+            document.getElementById('c-ach').innerHTML = achHTML;
+
+            // Hacking Minigame UI
+            document.getElementById('hack-tries').innerText = game.hack.tries;
+            document.getElementById('hack-succ').innerText = game.hack.succ;
+            let hBtn = document.getElementById('btn-start-hack');
+            if(!game.hack.active) {
+                if(game.hack.cd > Date.now()) {
+                    let hms = Math.ceil((game.hack.cd - Date.now()) / 1000);
+                    hBtn.style.display = 'block'; hBtn.disabled = true; hBtn.innerText = `Recharging: ${Math.floor(hms/60)}m ${hms%60}s`;
+                } else {
+                    hBtn.style.display = 'block'; hBtn.disabled = game.curr.coins < 50; hBtn.innerText = "Start Hack (50 Coins)";
+                }
             }
-            document.getElementById('c-mine-upg').innerHTML = muHTML;
-            let mBtn = document.getElementById('btn-start-mine'); let mStat = document.getElementById('mine-status');
-            if(game.mine.active) { mBtn.disabled = true; mStat.innerText = 'Mining...'; mStat.style.color = '#fef08a'; } 
-            else if(game.mine.cd > Date.now()) { mBtn.disabled = true; let ms = Math.ceil((game.mine.cd - Date.now()) / 1000); mStat.innerText = `CD: ${Math.floor(ms/60)}m ${ms%60}s`; mStat.style.color = '#ef4444'; } 
-            else { mBtn.disabled = (game.curr.coins < 20); mBtn.innerText = "Play (20 Coins)"; mStat.innerText = 'Ready!'; mStat.style.color = '#4ade80'; }
-            document.getElementById('mine-picks').innerText = game.mine.picks;
 
             // Evolutions UI
             document.getElementById('n-reb-lvl').innerText = `${game.normalReb}/10`;
-            let btnNR = document.getElementById('btn-n-reb');
-            let nDesc = document.getElementById('n-reb-next-desc');
-            let nProgF = document.getElementById('n-reb-prog-fill');
-            let nProgT = document.getElementById('n-reb-prog-txt');
+            let btnNR = document.getElementById('btn-n-reb'); let nDesc = document.getElementById('n-reb-next-desc'); let nProgF = document.getElementById('n-reb-prog-fill'); let nProgT = document.getElementById('n-reb-prog-txt');
             
             if(game.normalReb >= 10) {
                 btnNR.innerText = "MAXED"; btnNR.disabled = true;
                 nDesc.innerText = "All Unlocked"; nProgF.style.width = "100%"; nProgT.innerText = "MAX";
             } else {
                 let nR = normRebDB[game.normalReb];
-                btnNR.innerText = `Evolve (${fNum(nR.req)} Clicks)`;
-                btnNR.disabled = game.curr.clicks < nR.req;
-                nDesc.innerText = nR.desc;
-                let pc = Math.min((game.curr.clicks / nR.req) * 100, 100);
-                nProgF.style.width = pc + '%'; nProgT.innerText = `${fNum(game.curr.clicks)} / ${fNum(nR.req)}`;
+                btnNR.innerText = `Evolve (${fNum(nR.req)} Clicks)`; btnNR.disabled = game.curr.clicks < nR.req; nDesc.innerText = nR.desc;
+                let pc = Math.min((game.curr.clicks / nR.req) * 100, 100); nProgF.style.width = pc + '%'; nProgT.innerText = `${fNum(game.curr.clicks)} / ${fNum(nR.req)}`;
             }
 
             let cBuffsHTML = "";
             if(game.normalReb === 0) { cBuffsHTML = "<p>No Evolution Buffs yet.</p>"; }
             else {
-                let cb = normRebDB[game.normalReb-1];
-                cBuffsHTML += `<p>• ${cb.m}x Total Click Multiplier (TCM)</p>`;
-                if(cb.cb > 0) cBuffsHTML += `<p>• +${cb.cb * 100}% Base Coin Chance</p>`;
-                if(cb.mb > 0) cBuffsHTML += `<p>• +${cb.mb * 100}% Base Material Chance</p>`;
+                let cb = normRebDB[game.normalReb-1]; cBuffsHTML += `<p>• ${cb.m}x Total Click Multiplier (TCM)</p>`;
+                if(cb.cb > 0) cBuffsHTML += `<p>• +${cb.cb * 100}% Base Coin Chance</p>`; if(cb.mb > 0) cBuffsHTML += `<p>• +${cb.mb * 100}% Base Material Chance</p>`;
             }
             document.getElementById('c-n-reb-buffs').innerHTML = cBuffsHTML;
 
@@ -1395,11 +1663,7 @@
             if(sT >= 6) { btnT.innerText = "MAXED"; btnT.disabled = true; } else { btnT.innerText = sT === 0 ? `Unlock (${cT.cst} CP)` : `Upgrade (${cT.cst} CP)`; btnT.disabled = game.curr.cp < cT.cst; }
 
             // Stats update
-            document.getElementById('st-tc').innerText = fNum(game.stat.tClicks);
-            document.getElementById('st-mc').innerText = fNum(game.stat.manualClicks);
-            document.getElementById('st-mg').innerText = fNum(game.stat.mgPlayed || 0);
-            document.getElementById('st-ec').innerText = fNum(game.stat.epicCores || 0);
-            document.getElementById('st-lc').innerText = fNum(game.stat.legCores || 0);
+            document.getElementById('st-tc').innerText = fNum(game.stat.tClicks); document.getElementById('st-mc').innerText = fNum(game.stat.manualClicks); document.getElementById('st-mg').innerText = fNum(game.stat.mgPlayed || 0); document.getElementById('st-ec').innerText = fNum(game.stat.epicCores || 0); document.getElementById('st-lc').innerText = fNum(game.stat.legCores || 0);
         }
 
         // --- 12. INITIALIZATION & MAIN GAME LOOP ---
@@ -1407,20 +1671,35 @@
 
         setInterval(() => {
             game.stat.playtime++;
-            if(!game.corrupt.active && Date.now() > game.corrupt.cd && !game.galac.active) { if(Math.random() < 0.1) triggerCorruption(); else game.corrupt.cd = Date.now() + 60000; }
+            checkAch();
 
-            if(!game.corrupt.active) {
+            // Auto-buyers
+            if(game.autoBuyer.unlocked && !game.corrupt.active && !game.anomaly.active) {
+                for(let k in upgDB) {
+                    if(game.autoBuyer.conf[k] && game.autoBuyer.conf[k].on) {
+                        buyUpg(k, true);
+                    }
+                }
+            }
+
+            // Anomalies
+            if(!game.corrupt.active && !game.anomaly.active && !game.galac.active && Math.random() < 0.008) triggerAnomaly(); // Roughly once every 2 mins
+            if(game.anomaly.active) {
+                if(Date.now() >= game.anomaly.end && game.anomaly.type !== 'frozen') {
+                    game.anomaly.active = false; document.getElementById('main-scene').className = 'scene'; document.getElementById('anomaly-ui').style.display = 'none'; forceUI();
+                } else if(Date.now() >= game.anomaly.end && game.anomaly.type === 'frozen') {
+                    game.anomaly.active = false; document.getElementById('main-scene').className = 'scene'; document.getElementById('anomaly-ui').style.display = 'none'; notif("❄️ The ice melted..."); forceUI();
+                }
+            }
+
+            if(!game.corrupt.active && !game.anomaly.active) {
                 let cpm = game.upg.pass * getMult(); 
                 if(cpm > 0) { let cg = (cpm / 60); game.curr.coins += cg; progBounty('coins', cg); }
-                let spd = game.upg.auto * getMult(); if(game.shop.goldAuto) spd *= 2;
+                let spd = game.upg.auto * getMult(); if(game.shop.goldAuto) spd *= 2; if(game.shop.arts.battery) spd *= 1.5;
                 if(spd > 0) {
                     for(let i=0; i<spd; i++) triggerClick(null, null, false);
                     let scn = document.getElementById('main-scene'); scn.style.transform = 'scale(0.96)'; setTimeout(() => scn.style.transform = 'scale(1)', 100);
                 }
-            } else {
-                let drain = Math.max(1, Math.floor(game.curr.coins * 0.01)); game.curr.coins -= drain; if(game.curr.coins < 0) game.curr.coins = 0;
-                document.getElementById('crpt-time').innerText = Math.max(0, Math.ceil((game.corrupt.end - Date.now()) / 1000));
-                if(Date.now() > game.corrupt.end) { game.corrupt.active = false; game.corrupt.cd = Date.now() + 300000; document.getElementById('main-scene').classList.remove('corrupted'); document.getElementById('corrupt-ui').style.display = 'none'; notif("💀 Core Purge FAILED! Coins stolen!"); playSnd('boss'); }
             }
 
             let holdTime = 1500 + (game.upg.comboM * 500);
@@ -1437,7 +1716,7 @@
                 game.exped.readyToClaim = true;
                 game.exped.rD = Math.floor(Math.random() * 15) + 5; game.exped.rS = Math.floor(Math.random() * 4) + 1;
                 game.exped.rPId = game.exped.petId; // Store id to show name when claimed
-                notif("🚀 Expedition Pet is ready to return!"); playSnd('magic');
+                notif("🚀 Expedition Pet is ready to return!", 5000); playSnd('magic');
                 forceUI();
             }
 
@@ -1445,12 +1724,14 @@
             if(game.galac.active) {
                 if(Date.now() >= game.galac.end) {
                     game.galac.active = false; game.galac.next = Date.now() + 1800000; // 30 mins
+                    document.body.classList.remove('galactic-active');
                     notif("🌌 The Galactic Event has ended!"); forceUI();
                 }
             } else {
-                if(Date.now() >= game.galac.next) {
+                if(Date.now() >= game.galac.next && !game.anomaly.active && !game.corrupt.active) {
                     game.galac.active = true; game.galac.end = Date.now() + 60000; game.galac.potsBought = 0; // 1 min duration
-                    notif("🌌 A GALACTIC EVENT HAS BEGUN! 1 MINUTE!"); playSnd('magic'); forceUI();
+                    document.body.classList.add('galactic-active');
+                    notif("🌌 A GALACTIC EVENT HAS BEGUN! 1 MINUTE!", 5000); playSnd('magic'); forceUI();
                 }
             }
             
